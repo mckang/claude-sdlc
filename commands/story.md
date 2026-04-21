@@ -213,9 +213,34 @@ Story의 **담당 영역**을 보고 다음을 `Read`로 읽는다:
 - (c) 확인 필요 사항부터 해결 (예: /meeting 호출)
 ```
 
-#### 3-A-5: Story 브랜치 생성 (사용자 "구현 시작" 승인 직후)
+#### 3-A-5: Story 브랜치 생성 + 킥오프 기록 (사용자 "구현 시작" 승인 직후)
 
-사용자가 (a) 를 선택하면 **어떤 코드 작성 전에** 먼저 Story 브랜치를 만든다:
+사용자가 (a) 를 선택하면 **어떤 코드 작성 전에** 다음 순서를 엄수한다:
+
+**① 기존 kickoff.md 존재 확인**
+
+```bash
+FEATURE_DIR="${CLAUDE_PROJECT_DIR}/docs/plans/$NAME/$STORY_ID"
+KICKOFF_FILE="$FEATURE_DIR/kickoff.md"
+OVERWRITE_KICKOFF="yes"  # 기본값
+
+if [ -f "$KICKOFF_FILE" ]; then
+  PREV_SAVED=$(awk '/^saved_at:/{print $2; exit}' "$KICKOFF_FILE")
+  # 사용자에게 확인 요청 (아래 프롬프트 출력 후 응답 대기)
+  OVERWRITE_KICKOFF=""  # y/N 응답으로 설정
+fi
+```
+
+`$KICKOFF_FILE` 이 존재하면 Bash 실행을 일시 중단하고 사용자에게 아래 프롬프트를 출력한 뒤 응답을 받아 `OVERWRITE_KICKOFF` 을 채운 후 다음 블록을 실행한다.
+
+```
+⚠️ kickoff.md 가 이미 있습니다 (saved_at: <PREV_SAVED>).
+덮어쓸까요? (y/N)
+```
+- `y` → `OVERWRITE_KICKOFF=yes`
+- 그 외(엔터 포함) → `OVERWRITE_KICKOFF=no` (기존 파일 보존)
+
+**② Story 브랜치 생성**
 
 ```bash
 # main 을 최신으로 맞추고 (원격 있을 때만 pull)
@@ -234,12 +259,53 @@ git checkout -b story/<StoryID>-<slug>
   - `story/E5-S2a-next-in-progress`
   - `story/E6-S1-outbox-repo`
 
-브랜치 생성 후 사용자에게 1줄 보고 후 구현 시작:
-```
-🌿 브랜치 `story/E1-S2-make-ci-gate` 생성. 구현 시작합니다.
+실패 시 (원격 pull 실패 등) 경고만 남기고 로컬 main 기준으로 계속.
+
+**③ kickoff.md 저장 (OVERWRITE_KICKOFF=yes 일 때만)**
+
+브랜치 생성 **직후** 저장해야 프런트매터 `branch` 가 실제 브랜치와 일치.
+
+```bash
+mkdir -p "$FEATURE_DIR"
+
+SAVED_AT=$(date +%Y-%m-%dT%H:%M:%S%z)
+BRANCH_NAME=$(git branch --show-current 2>/dev/null || echo "(unknown)")
+
+# PLAN_REL 은 ${CLAUDE_PROJECT_DIR} 기준 상대경로
+PLAN_REL="${PLAN#${CLAUDE_PROJECT_DIR}/}"
 ```
 
-실패 시 (원격 pull 실패 등) 경고만 남기고 로컬 main 기준으로 계속.
+`Write` 로 `$KICKOFF_FILE` 생성:
+
+```markdown
+---
+story_id: <STORY_ID>
+story_title: <Story 제목>
+feature: <NAME>
+plan: <PLAN_REL>
+stage: kickoff
+saved_at: <SAVED_AT>
+branch: <BRANCH_NAME>
+---
+<사용자에게 출력한 킥오프 보고서 Markdown 본문 그대로>
+```
+
+`Write` 실패 시 경고 1줄 후 계속 진행 (저장은 보조 기능).
+
+**④ 최종 1줄 보고**
+
+- 저장 성공:
+  ```
+  🌿 브랜치 `story/<StoryID>-<slug>` 생성. 📝 kickoff.md 기록 (docs/plans/<NAME>/<STORY_ID>/kickoff.md). 구현 시작합니다.
+  ```
+- 저장 skip(덮어쓰기 거부):
+  ```
+  🌿 브랜치 `story/<StoryID>-<slug>` 생성. 📝 kickoff.md 보존 (기존 파일 유지). 구현 시작합니다.
+  ```
+- 저장 실패:
+  ```
+  🌿 브랜치 `story/<StoryID>-<slug>` 생성. ⚠️ kickoff.md 저장 실패 (<사유>). 구현 시작합니다.
+  ```
 
 ---
 
@@ -356,6 +422,41 @@ Grep으로 탐지 후 보고.
 `complete` 전에 위 항목들 해결하는 것을 권장합니다.
 ```
 
+#### 3-B-6: verify.md 저장 (조용한 덮어쓰기)
+
+보고서 출력 직후 `${CLAUDE_PROJECT_DIR}/docs/plans/$NAME/$STORY_ID/verify.md` 로 저장한다. 확인 프롬프트 없음 — verify 는 재실행이 정상 워크플로.
+
+```bash
+FEATURE_DIR="${CLAUDE_PROJECT_DIR}/docs/plans/$NAME/$STORY_ID"
+mkdir -p "$FEATURE_DIR"
+
+SAVED_AT=$(date +%Y-%m-%dT%H:%M:%S%z)
+BRANCH_NAME=$(git branch --show-current 2>/dev/null || echo "(unknown)")
+PLAN_REL="${PLAN#${CLAUDE_PROJECT_DIR}/}"
+```
+
+`Write` 로 `$FEATURE_DIR/verify.md` 생성 (기존 파일 덮어쓰기):
+
+```markdown
+---
+story_id: <STORY_ID>
+story_title: <Story 제목>
+feature: <NAME>
+plan: <PLAN_REL>
+stage: verify
+saved_at: <SAVED_AT>
+branch: <BRANCH_NAME>
+---
+<사용자에게 출력한 검증 요약 보고서 Markdown 본문 그대로>
+```
+
+보고서 말미에 1줄 추가:
+```
+📝 verify.md 갱신됨 (docs/plans/<NAME>/<STORY_ID>/verify.md)
+```
+
+`Write` 실패 시 경고 1줄 후 계속.
+
 ---
 
 ### 3-C: `complete` 단계 — 완료 처리
@@ -440,7 +541,62 @@ Refs: ${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.md#E1-S1
 `/sdlc:story start E1-S2` 로 시작하세요 (current feature 사용).
 ```
 
-#### 3-C-5: 커밋 · 머지 · 브랜치 정리 (완료 보고 직후)
+#### 3-C-5: complete.md 저장 (덮어쓰기 확인)
+
+완료 보고 출력 직후, 커밋·머지 전에 기록한다.
+
+```bash
+FEATURE_DIR="${CLAUDE_PROJECT_DIR}/docs/plans/$NAME/$STORY_ID"
+COMPLETE_FILE="$FEATURE_DIR/complete.md"
+OVERWRITE_COMPLETE="yes"
+
+if [ -f "$COMPLETE_FILE" ]; then
+  PREV_SAVED=$(awk '/^saved_at:/{print $2; exit}' "$COMPLETE_FILE")
+  OVERWRITE_COMPLETE=""  # y/N 응답으로 설정
+fi
+```
+
+`$COMPLETE_FILE` 이 존재하면 Bash 실행을 일시 중단하고 사용자에게 아래 프롬프트를 출력한 뒤 응답을 받아 `OVERWRITE_COMPLETE` 를 채운 후 다음 블록을 실행한다.
+
+```
+⚠️ complete.md 가 이미 있습니다 (saved_at: <PREV_SAVED>).
+이 Story 는 이미 한 번 완료 처리됐을 수 있습니다. 덮어쓸까요? (y/N)
+```
+- `y` → `OVERWRITE_COMPLETE=yes`
+- 그 외(엔터 포함) → `OVERWRITE_COMPLETE=no` (기존 파일 보존)
+
+`OVERWRITE_COMPLETE=yes` 일 때만:
+
+```bash
+mkdir -p "$FEATURE_DIR"
+SAVED_AT=$(date +%Y-%m-%dT%H:%M:%S%z)
+BRANCH_NAME=$(git branch --show-current 2>/dev/null || echo "(unknown)")
+PLAN_REL="${PLAN#${CLAUDE_PROJECT_DIR}/}"
+```
+
+`Write` 로 `$COMPLETE_FILE` 생성 (덮어쓰기):
+
+```markdown
+---
+story_id: <STORY_ID>
+story_title: <Story 제목>
+feature: <NAME>
+plan: <PLAN_REL>
+stage: complete
+saved_at: <SAVED_AT>
+branch: <BRANCH_NAME>
+---
+<사용자에게 출력한 완료 보고서 Markdown 본문 그대로>
+```
+
+저장 결과 1줄:
+- 성공: `📝 complete.md 기록됨 (docs/plans/<NAME>/<STORY_ID>/complete.md)`
+- skip: `📝 complete.md 보존 (기존 파일 유지)`
+- 실패: `⚠️ complete.md 저장 실패 (<사유>)`
+
+`Write` 실패 시 경고 1줄 후 아래 커밋·머지 흐름은 정상 진행 (저장은 보조 기능).
+
+#### 3-C-6: 커밋 · 머지 · 브랜치 정리 (완료 보고 직후)
 
 Story 브랜치에서 작업했을 때만 수행. 아니면 이 단계 skip 하고 사용자에게 한 줄 경고:
 `⚠️ Story 브랜치 규칙을 따르지 않음 — 수동 정리 필요`
@@ -486,6 +642,7 @@ Story `story/E1-S2-make-ci-gate` 작업 완료. 통합 방식을 선택하세요
 - **세션 간 재현 가능**: `start` 실행만으로 필요한 맥락이 다 로드되도록 설계.
 - **블로킹 감지 시 대안 제시**: 다른 Story로 병렬 작업 제안.
 - **브랜치 전략 (필수)**: 모든 Story 는 `main` 에서 분기한 `story/<StoryID>-<kebab-slug>` 브랜치에서 작업하고, `complete` 시 main 에 머지한 뒤 브랜치를 삭제한다. `main` 에서 직접 커밋 금지. 예외(주석·문서 오타 수정 등)는 사용자 명시 요청 시에만 허용.
+- **단계별 보고서 저장 (필수)**: `start`(승인 후)·`verify`·`complete` 각 단계는 `${CLAUDE_PROJECT_DIR}/docs/plans/<feature>/<Story-ID>/{kickoff,verify,complete}.md` 로 저장된다. `start`·`complete` 는 기존 파일이 있으면 덮어쓰기 확인, `verify` 는 조용히 덮어쓰기. 저장 실패는 핵심 워크플로를 막지 않는다.
 
 ## 5단계: 에러 처리
 

@@ -13,6 +13,7 @@
 
 ## 2. Story 단위 작업
 개발은 Story 단위로. `/sdlc:story start` → 사용자 승인 → 구현 → `/sdlc:story verify` → `/sdlc:story complete`.
+각 단계 보고서는 `docs/plans/<feature>/<Story-ID>/{kickoff,verify,complete}.md` 로 자동 저장된다.
 
 ## 3. 구현 중 금지
 - 표준 위반 (금지 사항 준수)
