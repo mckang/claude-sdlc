@@ -405,7 +405,7 @@ Plan 파일에서 해당 Story의:
 - src/test/java/.../MigrationIntegrationTest.java
 
 **수정 (1개)**:
-- ${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md (4장 "데이터 모델"에 실제 컬럼명 반영)
+- ${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-checkout-v2.md (4장 "데이터 모델"에 실제 컬럼명 반영)
 
 ## 신규 의존성
 없음
@@ -428,7 +428,7 @@ feat(auth): E1-S1 인증 토큰 DB 스키마
 - 인덱스: 사용자별·만료 기반 부분 인덱스
 - 마이그레이션 온라인 적용 가능 확인
 
-Refs: ${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md#E1-S1
+Refs: ${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.md#E1-S1
 ```
 
 ## 다음 Story 제안

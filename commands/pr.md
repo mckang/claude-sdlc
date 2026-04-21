@@ -135,7 +135,7 @@ scope 추출 규칙:
 
 **ID**: E1-S1
 **제목**: 토큰 테이블 마이그레이션
-**Plan**: [${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md](${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md)
+**Plan**: [${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.md](${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.md)
 **크기**: M
 
 ## 🎯 변경 요약
@@ -160,7 +160,7 @@ scope 추출 규칙:
 - [x] 단위 테스트 통과
 - [x] 린트·타입체크 통과
 - [x] 코드 리뷰 준비
-- [x] 문서 업데이트 (`${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md` 4장)
+- [x] 문서 업데이트 (`${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-checkout-v2.md` 4장)
 - [ ] 스테이징 배포 (PR 머지 후 자동)
 
 ## 📦 변경된 파일
@@ -172,7 +172,7 @@ scope 추출 규칙:
 src/main/resources/db/migration/V020__... | +23
 src/main/resources/db/migration/V021__... | +45
 src/test/.../MigrationIntegrationTest.java | +52
-${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md   | -18 +22
+${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-checkout-v2.md   | -18 +22
 ```
 
 ## 🧪 테스트
@@ -192,9 +192,9 @@ ${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md   | -
 
 ## 🔗 관련 링크
 
-- PRD: [${CLAUDE_PROJECT_DIR}/docs/prd/prd-email-verification.md](${CLAUDE_PROJECT_DIR}/docs/prd/prd-email-verification.md)
-- 아키텍처: [${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md](${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md)
-- 의존성 그래프: [${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.deps.md](${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.deps.md)
+- PRD: [${CLAUDE_PROJECT_DIR}/docs/prd/prd-checkout-v2.md](${CLAUDE_PROJECT_DIR}/docs/prd/prd-checkout-v2.md)
+- 아키텍처: [${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-checkout-v2.md](${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-checkout-v2.md)
+- 의존성 그래프: [${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.deps.md](${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.deps.md)
 
 ## 🚦 리뷰어 체크포인트
 
@@ -212,7 +212,7 @@ ${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md   | -
 ---
 
 🤖 Generated with Claude Code (meeting-system v7)
-Story: E1-S1 | Plan: plan-email-verification.md
+Story: E1-S1 | Plan: plan-checkout-v2.md
 ```
 
 ## 7단계: 커밋 메시지 정리 제안 (선택)
@@ -230,7 +230,7 @@ feat(auth): E1-S1 토큰 기반 인증 스키마
 - 부분 인덱스로 활성 토큰만 빠른 조회
 - 온라인 마이그레이션 안전성 검증
 
-Refs: ${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md#E1-S1
+Refs: ${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.md#E1-S1
 Story-Size: M
 ```
 
@@ -260,7 +260,7 @@ https://github.com/<owner>/<repo>/compare/main...$(git branch --show-current)
 ```
 ⚠️ 실제로 git push 및 PR 생성을 진행할까요?
 
-- 현재 브랜치: feature/email-verification-E1-S1
+- 현재 브랜치: feature/checkout-v2-E1-S1
 - 원격 push 대상: origin
 - PR 대상 브랜치: main
 - Draft PR: ${draft_on_off}
@@ -328,7 +328,7 @@ gh pr create --body-file ${CLAUDE_PROJECT_DIR}/docs/pr-drafts/E1-S1.md --base ma
 
 - Story complete 직후 바로 실행하는 흐름 권장:
   ```
-  /story complete E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md
-  /pr E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md
+  /story complete E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.md
+  /pr E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.md
   ```
 - 팀마다 브랜치·PR 관례 다를 수 있음 → `${CLAUDE_PROJECT_DIR}/docs/guides/development-workflow.md` 에 팀 규칙 명시 권장

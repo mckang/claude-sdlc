@@ -13,7 +13,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ```
 /sdlc:scope-change                                                   # current feature 사용
 /sdlc:scope-change "SMS 인증 추가 요청"                                # current + 사유
-/sdlc:scope-change email-verification "M2 에 SMS 인증 추가"             # 이름 + 사유
+/sdlc:scope-change checkout-v2 "M2 에 SMS 인증 추가"             # 이름 + 사유
 /sdlc:scope-change docs/plans/plan-x.md "사유"                         # 명시 경로
 ```
 
@@ -165,7 +165,7 @@ T-shirt size 합산:
 
 ```bash
 mkdir -p ${CLAUDE_PROJECT_DIR}/docs/plans/archive
-cp ${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md ${CLAUDE_PROJECT_DIR}/docs/plans/archive/plan-email-verification-20260421-1430.md
+cp ${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.md ${CLAUDE_PROJECT_DIR}/docs/plans/archive/plan-checkout-v2-20260421-1430.md
 ```
 
 ## 5단계: Plan 수정
@@ -215,7 +215,7 @@ Plan 상단에 "## 🔄 변경 이력" 섹션이 없으면 생성, 있으면 맨
   - 마일스톤: M2 목표 +1주 지연 (주 4 → 주 5)
   - 크리티컬 패스: 변경 없음 (SMS는 병렬)
   - 예상 공수: +M (3일)
-- **원본 백업**: [archive/plan-email-verification-20260421-1430.md](archive/plan-email-verification-20260421-1430.md)
+- **원본 백업**: [archive/plan-checkout-v2-20260421-1430.md](archive/plan-checkout-v2-20260421-1430.md)
 
 ### 2026-04-15 10:00 — Change #2
 - ...
@@ -239,7 +239,7 @@ Plan 상단에 "## 🔄 변경 이력" 섹션이 없으면 생성, 있으면 맨
 # Scope Change #3: SMS 인증 추가
 
 - **날짜**: 2026-04-21 14:30
-- **Plan**: ${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md
+- **Plan**: ${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.md
 - **유형**: 추가
 - **긴급도**: 🟡 중요
 
@@ -270,9 +270,9 @@ Plan 상단에 "## 🔄 변경 이력" 섹션이 없으면 생성, 있으면 맨
 - [ ] E2-S1 (기존 이메일 발송)과의 조정
 
 ## 관련 링크
-- 원본 Plan 백업: [archive/plan-email-verification-20260421-1430.md](../archive/plan-email-verification-20260421-1430.md)
+- 원본 Plan 백업: [archive/plan-checkout-v2-20260421-1430.md](../archive/plan-checkout-v2-20260421-1430.md)
 - 요청 meeting: [${CLAUDE_PROJECT_DIR}/docs/meetings/sms-2fa-request.md](../../meetings/sms-2fa-request.md)
-- 의존성 그래프 갱신: [plan-email-verification.deps.md](../plan-email-verification.deps.md)
+- 의존성 그래프 갱신: [plan-checkout-v2.deps.md](../plan-checkout-v2.deps.md)
 ```
 
 ## 8단계: Plan 상단 스냅샷 업데이트
@@ -297,8 +297,8 @@ Change #3 (2026-04-21)
 - 크리티컬 패스: 변경 없음 (병렬)
 - 예상 공수: +M (3일)
 
-백업: ${CLAUDE_PROJECT_DIR}/docs/plans/archive/plan-email-verification-20260421-1430.md
-상세 리포트: ${CLAUDE_PROJECT_DIR}/docs/plans/scope-changes/plan-email-verification-003.md
+백업: ${CLAUDE_PROJECT_DIR}/docs/plans/archive/plan-checkout-v2-20260421-1430.md
+상세 리포트: ${CLAUDE_PROJECT_DIR}/docs/plans/scope-changes/plan-checkout-v2-003.md
 
 다음 단계 제안:
 1. 영향받는 팀에 공지 (Slack·이메일)
