@@ -1,0 +1,8 @@
+# Local dev notes (플러그인 개발자 개인 메모)
+CLAUDE.md
+
+# macOS
+.DS_Store
+
+# Claude Code local session artifacts
+.claude/
