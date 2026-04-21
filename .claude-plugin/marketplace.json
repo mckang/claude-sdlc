@@ -8,7 +8,7 @@
       "name": "sdlc",
       "source": "./",
       "description": "SDLC support: 11 commands + 21 personas",
-      "version": "1.0.1"
+      "version": "1.0.2"
     }
   ]
 }
