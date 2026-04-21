@@ -6,3 +6,6 @@ CLAUDE.md
 
 # Claude Code local session artifacts
 .claude/
+
+# Plugin 개발 메모·설계서 (로컬만)
+docs/superpowers/
