@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob
 
 # SDLC 프로젝트 초기화
 
-현재 사용자 프로젝트(`${CLAUDE_PROJECT_DIR}`)에 SDLC 플러그인이 동작하는 데 필요한 디렉토리 구조, 표준 문서, 샘플 템플릿을 설치한다.
+현재 사용자 프로젝트(`${CLAUDE_PROJECT_DIR}`)에 SDLC 플러그인이 동작하는 데 필요한 디렉토리 구조와 표준 문서를 설치한다.
 
 ## 1단계: 작업 디렉토리 생성
 
@@ -30,22 +30,9 @@ cp -Rn "${CLAUDE_PLUGIN_ROOT}/templates/docs/standards/." "${CLAUDE_PROJECT_DIR}
 cp -Rn "${CLAUDE_PLUGIN_ROOT}/templates/docs/guides/." "${CLAUDE_PROJECT_DIR}/docs/guides/"
 ```
 
-## 4단계: 샘플 PRD/아키텍처 설치 (선택)
+## 4단계: CLAUDE.md 처리 (대화식)
 
-샘플은 **신규 명명 규약** (`<type>-<name>.md`) 을 따른다. 이미 있으면 건너뜀.
-
-```bash
-if [ ! -f "${CLAUDE_PROJECT_DIR}/docs/prd/prd-email-verification.md" ]; then
-  cp "${CLAUDE_PLUGIN_ROOT}/templates/docs/prd/prd-email-verification.md" "${CLAUDE_PROJECT_DIR}/docs/prd/"
-fi
-if [ ! -f "${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md" ]; then
-  cp "${CLAUDE_PLUGIN_ROOT}/templates/docs/architecture/architecture-email-verification.md" "${CLAUDE_PROJECT_DIR}/docs/architecture/"
-fi
-```
-
-## 5단계: CLAUDE.md 처리 (대화식)
-
-### 5-a. 프로젝트 오너 이름 수집
+### 4-a. 프로젝트 오너 이름 수집
 
 사용자에게 다음을 **먼저 출력한 뒤 응답을 기다려라**:
 
@@ -57,7 +44,7 @@ fi
 
 사용자 응답 문자열을 `OWNER_NAME` 변수로 보관한다. 응답이 빈 문자열이면 이후의 오너 섹션 처리는 모두 생략한다.
 
-### 5-b. CLAUDE.md 처리 분기
+### 4-b. CLAUDE.md 처리 분기
 
 `DEST` 가 존재하지 않으면 템플릿을 복사한 뒤 오너 섹션을 치환/제거.
 `DEST` 가 이미 존재하면 파일을 보존한 채 오너 섹션만 조건부 append.
@@ -97,7 +84,7 @@ else
 fi
 ```
 
-## 6단계: .gitignore 업데이트
+## 5단계: .gitignore 업데이트
 
 `.gitignore` 에 다음 항목이 없으면 추가:
 
@@ -116,7 +103,7 @@ for entry in "docs/standups/" "docs/pr-drafts/" "docs/onboarding/" "docs/plans/a
 done
 ```
 
-## 7단계: 완료 안내
+## 6단계: 완료 안내
 
 다음 형식으로 요약을 출력:
 
@@ -127,8 +114,6 @@ done
 - `docs/` 트리 (features, prd, architecture, plans, meetings, ...)
 - `docs/standards/` 25개 표준 문서 (backend/frontend/database)
 - `docs/guides/development-workflow.md`
-- 샘플 PRD: `docs/prd/prd-email-verification.md`
-- 샘플 아키텍처: `docs/architecture/architecture-email-verification.md`
 - CLAUDE.md (기존 없을 때만)
 
 ## 다음 단계 (권장 워크플로우)

@@ -133,7 +133,7 @@ docs/
 
 ## 버전
 
-- **v1.1.0** — `/sdlc:feature`, `/sdlc:prd`, `/sdlc:architecture` 3개 커맨드 추가로 워크플로우 정형화. `docs/features/` 디렉토리 도입. **산출물 파일명 규약 변경**: `docs/<type>/<name>.md` → `docs/<type>/<type>-<name>.md` (breaking — 기존 프로젝트는 rename 필요). **Current Feature 메커니즘**: `/sdlc:feature` 가 CLAUDE.md 에 자동 등록, 후속 커맨드는 이름 인자 생략 시 이를 사용. 설계서: `docs/superpowers/specs/2026-04-21-sdlc-workflow-design.md`.
+- **v1.1.0** — `/sdlc:feature`, `/sdlc:prd`, `/sdlc:architecture` 3개 커맨드 추가로 워크플로우 정형화. `docs/features/` 디렉토리 도입. **산출물 파일명 규약 변경**: `docs/<type>/<name>.md` → `docs/<type>/<type>-<name>.md` (breaking — 기존 프로젝트는 rename 필요). **Current Feature 메커니즘**: `/sdlc:feature` 가 CLAUDE.md 에 자동 등록, 후속 커맨드는 이름 인자 생략 시 이를 사용. **샘플 PRD/아키텍처 제거**: 커맨드가 직접 생성하므로 `email-verification` 샘플 파일은 더 이상 설치되지 않는다.
 - **v1.0.2** — `/sdlc:init` step 5 에 프로젝트 오너 대화식 프롬프트 추가.
 - **v1.0.1** — marketplace.json `source` 스키마 수정 (`"."` → `"./"`).
 - **v1.0.0** — 최초 릴리스. 11개 커맨드 + 21개 페르소나 + 25개 표준 + 샘플 PRD/아키텍처.
