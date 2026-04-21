@@ -13,7 +13,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob
 다음 명령으로 `docs/` 트리를 생성한다 (이미 있는 디렉토리는 건너뜀).
 
 ```bash
-mkdir -p "${CLAUDE_PROJECT_DIR}/docs"/{prd,architecture,plans,plans/archive,plans/scope-changes,meetings,retrospectives,standups,pr-drafts,onboarding,guides,standards}
+mkdir -p "${CLAUDE_PROJECT_DIR}/docs"/{features,prd,architecture,plans,plans/archive,plans/scope-changes,meetings,retrospectives,standups,pr-drafts,onboarding,guides,standards}
 ```
 
 ## 2단계: 표준 문서 설치
@@ -32,14 +32,14 @@ cp -Rn "${CLAUDE_PLUGIN_ROOT}/templates/docs/guides/." "${CLAUDE_PROJECT_DIR}/do
 
 ## 4단계: 샘플 PRD/아키텍처 설치 (선택)
 
-샘플이 이미 있는지 확인하고 없으면 설치:
+샘플은 **신규 명명 규약** (`<type>-<name>.md`) 을 따른다. 이미 있으면 건너뜀.
 
 ```bash
-if [ ! -f "${CLAUDE_PROJECT_DIR}/docs/prd/email-verification.md" ]; then
-  cp "${CLAUDE_PLUGIN_ROOT}/templates/docs/prd/email-verification.md" "${CLAUDE_PROJECT_DIR}/docs/prd/"
+if [ ! -f "${CLAUDE_PROJECT_DIR}/docs/prd/prd-email-verification.md" ]; then
+  cp "${CLAUDE_PLUGIN_ROOT}/templates/docs/prd/prd-email-verification.md" "${CLAUDE_PROJECT_DIR}/docs/prd/"
 fi
-if [ ! -f "${CLAUDE_PROJECT_DIR}/docs/architecture/email-verification.md" ]; then
-  cp "${CLAUDE_PLUGIN_ROOT}/templates/docs/architecture/email-verification.md" "${CLAUDE_PROJECT_DIR}/docs/architecture/"
+if [ ! -f "${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md" ]; then
+  cp "${CLAUDE_PLUGIN_ROOT}/templates/docs/architecture/architecture-email-verification.md" "${CLAUDE_PROJECT_DIR}/docs/architecture/"
 fi
 ```
 
@@ -124,26 +124,32 @@ done
 # ✓ SDLC 플러그인 초기화 완료
 
 ## 설치된 것
-- `docs/` 트리 (prd, architecture, plans, meetings, ...)
+- `docs/` 트리 (features, prd, architecture, plans, meetings, ...)
 - `docs/standards/` 25개 표준 문서 (backend/frontend/database)
 - `docs/guides/development-workflow.md`
-- 샘플 PRD: `docs/prd/email-verification.md`
-- 샘플 아키텍처: `docs/architecture/email-verification.md`
+- 샘플 PRD: `docs/prd/prd-email-verification.md`
+- 샘플 아키텍처: `docs/architecture/architecture-email-verification.md`
 - CLAUDE.md (기존 없을 때만)
 
-## 다음 단계
+## 다음 단계 (권장 워크플로우)
 
-1. **PRD 작성**: `docs/prd/<feature>.md` 에 요구사항 작성
-2. **아키텍처 설계**: `docs/architecture/<feature>.md` 에 설계 작성
-   - 또는 `/sdlc:meeting architect, backend, dba | <주제>` 로 토론
-3. **Plan 생성**: `/sdlc:plan docs/prd/<feature>.md docs/architecture/<feature>.md docs/plans/<feature>.md`
-4. **Story 시작**: `/sdlc:story start E1-S1 docs/plans/<feature>.md`
+1. **Feature 요구사항**: `/sdlc:feature <name>` — 대화로 기능 리스트 수집 + CLAUDE.md 에 current feature 등록
+2. **PRD 생성**: `/sdlc:prd` — current feature 이어받아 공식 PRD
+3. **아키텍처 설계**: `/sdlc:architecture` — PRD 기반 + 표준 링크
+4. **Plan 생성**: `/sdlc:plan` — Epic→Story→Task 분해
+5. **Story 시작**: `/sdlc:story start E1-S1`
+6. **PR 생성**: `/sdlc:pr E1-S1`
+
+모든 단계는 current feature 를 이어받으며, 명시 지정하려면 각 커맨드에 `<name>` 을 인자로 준다.
+산출물 파일명 규약: `docs/<type>/<type>-<name>.md` (예: `docs/plans/plan-html5-tetris.md`).
 
 ## 사용 가능한 커맨드
-- `/sdlc:roles` — 21명 페르소나 목록
+- `/sdlc:feature` — Feature 요구사항 수집 (PRD 씨앗)
+- `/sdlc:prd` — 공식 PRD 생성
+- `/sdlc:architecture` — 아키텍처 + 표준 문서 링크
 - `/sdlc:plan` — Epic→Story→Task 분해
 - `/sdlc:story` — Story 개발 사이클
-- `/sdlc:meeting` — 팀 토론
+- `/sdlc:meeting` — 범용 팀 토론 (위 워크플로우 외 임의 토픽)
 - `/sdlc:standup` — 일일 스탠드업
 - `/sdlc:status` — 진행 상황 집계
 - `/sdlc:pr` — PR 본문 생성
@@ -151,6 +157,7 @@ done
 - `/sdlc:plan-review` — Plan 리뷰
 - `/sdlc:retrospective` — 회고
 - `/sdlc:onboard` — 새 팀원 온보딩
+- `/sdlc:roles` — 21명 페르소나 목록
 ```
 
 ## 에러 처리

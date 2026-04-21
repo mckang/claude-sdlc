@@ -4,12 +4,14 @@ Plan이 준비된 상태에서 실제 코드 작성을 시작하는 가이드.
 
 ## 전제 조건
 
-다음이 모두 있어야 한다:
-- `docs/prd/<feature>.md`
-- `docs/architecture/<feature>.md`
-- `docs/plans/<feature>.md` — Epic/Story/Task 분해 완료
-- `docs/plans/<feature>.deps.md` — 의존성 그래프 (선택)
+다음이 모두 있어야 한다 (`<feature>` 는 kebab-case 식별자):
+- `docs/features/feature-<feature>.md` — 초기 아이디어
+- `docs/prd/prd-<feature>.md` — 요구사항
+- `docs/architecture/architecture-<feature>.md` — 설계
+- `docs/plans/plan-<feature>.md` — Epic/Story/Task 분해 완료
+- `docs/plans/plan-<feature>.deps.md` — 의존성 그래프 (선택)
 - `docs/standards/` — 팀 표준 문서
+- `CLAUDE.md` 의 `## Current Feature` 섹션에 `<feature>` 이름이 등록되어 있음 (`/sdlc:feature` 실행 시 자동)
 
 ## 전체 사이클 (한 Story당)
 
@@ -65,14 +67,15 @@ claude
 Claude에게 프로젝트 맥락 주입:
 
 ```
-> 이 프로젝트는 다음 문서들을 기반으로 개발됩니다:
-> - PRD: docs/prd/<feature>.md
-> - 아키텍처: docs/architecture/<feature>.md  
-> - Plan: docs/plans/<feature>.md
-> 
+> 이 프로젝트는 CLAUDE.md 의 Current Feature 를 중심으로 다음 문서들을 기반으로 개발됩니다:
+> - Feature: docs/features/feature-<feature>.md
+> - PRD: docs/prd/prd-<feature>.md
+> - 아키텍처: docs/architecture/architecture-<feature>.md
+> - Plan: docs/plans/plan-<feature>.md
+>
 > 참조 표준: docs/standards/ 아래 (스택에 따라 자동 참조)
-> 
-> 먼저 Plan을 읽고 현재 진행 상황을 /status 로 파악해주세요.
+>
+> 먼저 Plan을 읽고 현재 진행 상황을 /sdlc:status 로 파악해주세요.
 > 그 다음 다음 작업할 Story를 제안해주세요.
 ```
 
@@ -336,14 +339,14 @@ git commit -m "feat(verification): E1-S1 토큰 기반 구조 구현
 1. 새 세션 시작
 2. Claude에게:
    ```
-   > 다음 문서들을 읽고 현재 상태 파악:
-   > - docs/plans/<feature>.md (특히 최근 상태 스냅샷)
-   > - docs/prd/<feature>.md
-   > - docs/architecture/<feature>.md
-   > 
+   > CLAUDE.md 의 Current Feature 확인 후 다음 문서들을 읽고 현재 상태 파악:
+   > - docs/plans/plan-<feature>.md (특히 최근 상태 스냅샷)
+   > - docs/prd/prd-<feature>.md
+   > - docs/architecture/architecture-<feature>.md
+   >
    > 어느 Story까지 완료됐고 다음에 뭘 해야 하는지 알려주세요.
    ```
-3. `/status` 로 재확인
+3. `/sdlc:status` 로 재확인
 4. 그 다음 Story 킥오프
 
 ---

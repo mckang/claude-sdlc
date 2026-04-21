@@ -6,6 +6,13 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 # 미팅 진행 명령
 
+> **위치**: 이 커맨드는 **범용 팀 토론**용이다. 아래 워크플로우 단계는 **전문화된 커맨드**를 우선 사용하라:
+> - Feature 요구사항 수집 → `/sdlc:feature <name>`
+> - PRD 생성 → `/sdlc:prd <name>`
+> - 아키텍처 설계 → `/sdlc:architecture <name>`
+>
+> `/sdlc:meeting` 은 운영 이슈·스코프 협의·임의 토픽 등 위에 해당하지 않는 토론에 사용한다.
+
 사용자가 `/meeting <참석자> | <주제> ` 형태로 호출했다.
 전체 인자: `$ARGUMENTS`
 

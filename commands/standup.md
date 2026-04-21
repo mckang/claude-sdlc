@@ -1,28 +1,49 @@
 ---
-argument-hint: [Plan파일경로] [--since=<날짜|어제|지난스탠드업>]
+argument-hint: [Plan|feature이름, 생략 시 current] [--since=<날짜|어제|지난스탠드업>]
 description: Plan + git 히스토리 기반 일일 스탠드업 리포트 자동 생성
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
 # 스탠드업 리포트 생성
 
-사용자가 `/standup <Plan파일> [--since=...]` 형태로 호출했다.
+사용자가 `/standup [Plan|feature이름] [--since=...]` 형태로 호출했다.
 전체 인자: `$ARGUMENTS`
 
 예시:
 ```
-/standup ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md
-/standup ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md --since=어제
-/standup ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md --since=2026-04-18
+/sdlc:standup                                               # current feature 사용
+/sdlc:standup --since=어제                                   # current + 기간
+/sdlc:standup checkout-v2 --since=2026-04-18                # feature 이름 + 기간
+/sdlc:standup docs/plans/plan-checkout-v2.md                # 명시 경로
 ```
 
 ## 1단계: 인자 파싱
 
-- `$1`: Plan 경로 (필수)
+- `$1`: Plan 파일 경로 또는 feature 이름 (선택 — 생략 시 current feature)
 - `--since=` 플래그 (선택) — 기본: 마지막 스탠드업 또는 24시간 전
   - `어제`: 전날 00:00 이후
   - `지난스탠드업`: 마지막 스탠드업 파일의 작성 시각
   - ISO 날짜 (`2026-04-18`)
+
+### Plan 경로 resolve
+
+```bash
+ARG1="$1"
+if [ -z "$ARG1" ] || [[ "$ARG1" == --* ]]; then
+  CLAUDE_MD="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
+  NAME=""
+  if [ -f "$CLAUDE_MD" ]; then
+    NAME=$(awk '/^## Current Feature$/{flag=1; next} flag && /^- \*\*이름\*\*:/{sub(/^- \*\*이름\*\*: */, ""); print; exit}' "$CLAUDE_MD")
+  fi
+  if [ -z "$NAME" ]; then echo "❌ Plan 경로 미지정 + Current Feature 없음."; exit 1; fi
+  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
+elif [ -f "$ARG1" ]; then
+  PLAN="$ARG1"
+else
+  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$ARG1.md"
+fi
+test -f "$PLAN" || { echo "❌ Plan 파일 없음: $PLAN"; exit 1; }
+```
 
 ## 2단계: Plan 및 스냅샷 로드
 

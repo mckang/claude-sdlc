@@ -1,19 +1,19 @@
 ---
-argument-hint: [Plan파일경로] [산출물경로] [--scope=all|m1|epic:E1]
+argument-hint: [Plan파일|feature이름, 생략 시 current] [산출물경로, 생략 시 자동] [--scope=all|m1|epic:E1]
 description: Plan 문서를 팀 페르소나가 4축으로 리뷰해 Finding·수정 제안 리포트 생성
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
 # 팀 리뷰 (Plan Review) 세션
 
-사용자가 `/plan-review <Plan파일> <산출물경로> [--scope=...]` 형태로 호출했다.
+사용자가 `/plan-review [Plan|feature이름] [산출물경로] [--scope=...]` 형태로 호출했다.
 전체 인자: `$ARGUMENTS`
 
 예시:
 ```
-/plan-review ${CLAUDE_PROJECT_DIR}/docs/plans/plan.md ${CLAUDE_PROJECT_DIR}/docs/plans/plan.review.md
-/plan-review ${CLAUDE_PROJECT_DIR}/docs/plans/checkout-v2.md ${CLAUDE_PROJECT_DIR}/docs/plans/checkout-v2.review.md --scope=m1
-/plan-review ${CLAUDE_PROJECT_DIR}/docs/plans/plan.md ${CLAUDE_PROJECT_DIR}/docs/plans/plan.review.md --scope=epic:E5
+/sdlc:plan-review                                             # current feature 사용 (자동 산출물)
+/sdlc:plan-review checkout-v2 --scope=m1                      # feature 이름 + 스코프
+/sdlc:plan-review docs/plans/plan-x.md docs/plans/plan-x.review.md --scope=epic:E5   # 명시 경로
 ```
 
 본 명령의 목적:
@@ -23,20 +23,50 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 ## 1단계: 인자 파싱 및 검증
 
-- `$1`: Plan 파일 경로 (필수)
-- `$2`: 리뷰 리포트 저장 경로 (필수, 관례: `<plan-basename>.review.md`)
+- `$1`: Plan 파일 경로 또는 feature 이름 (선택 — 생략 시 current feature)
+- `$2`: 리뷰 리포트 저장 경로 (선택 — 생략 시 Plan 경로 기반 자동 생성)
 - 스코프 플래그 (선택):
   - `--scope=all` (기본) — Plan 전체
   - `--scope=m1` / `--scope=m2` ... — 특정 마일스톤 Story 만
   - `--scope=epic:E1` / `--scope=epic:E5` ... — 특정 Epic Story 만
 
-Plan 파일 존재 확인. 없으면 중단.
+### Plan 경로 및 산출물 경로 resolve
 
 ```bash
-test -f "$1" || echo "Plan 파일 없음: $1"
-```
+ARG1="$1"
+ARG2="$2"
 
-산출물 디렉터리 없으면 `mkdir -p`.
+# Plan 경로 확정
+if [ -z "$ARG1" ] || [[ "$ARG1" == --* ]]; then
+  CLAUDE_MD="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
+  NAME=""
+  if [ -f "$CLAUDE_MD" ]; then
+    NAME=$(awk '/^## Current Feature$/{flag=1; next} flag && /^- \*\*이름\*\*:/{sub(/^- \*\*이름\*\*: */, ""); print; exit}' "$CLAUDE_MD")
+  fi
+  if [ -z "$NAME" ]; then
+    echo "❌ Plan 경로 미지정 + Current Feature 없음."
+    exit 1
+  fi
+  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
+elif [ -f "$ARG1" ]; then
+  PLAN="$ARG1"
+  NAME=$(basename "$PLAN" .md | sed 's/^plan-//')
+else
+  NAME="$ARG1"
+  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
+fi
+
+test -f "$PLAN" || { echo "❌ Plan 파일 없음: $PLAN"; exit 1; }
+
+# 산출물 경로 확정
+if [ -z "$ARG2" ] || [[ "$ARG2" == --* ]]; then
+  OUT="${PLAN%.md}.review.md"
+else
+  OUT="$ARG2"
+fi
+
+mkdir -p "$(dirname "$OUT")"
+```
 
 ## 2단계: 입력 문서 로드
 
@@ -236,7 +266,7 @@ Sean 이 누적된 Finding 을 **표** 로 정리:
 
 ## 6단계: 산출물 작성
 
-`$2` 경로에 다음 형식으로 저장:
+`$OUT` 경로에 다음 형식으로 저장:
 
 ```markdown
 # 팀 리뷰: {Plan 제목}
@@ -334,7 +364,7 @@ Plan 상단에 "## 📝 리뷰 이력" 섹션 없으면 생성, 있으면 append
 ```
 ✅ 팀 리뷰 완료
 
-대상: {$1}
+대상: {$PLAN}
 스코프: {all/m1/...}
 참석자: {N명}
 
@@ -343,7 +373,7 @@ Finding: 총 {N}건
 - 🟡 Concern {Y}건 (해당 Story 착수 전 재검토)
 - 🟢 Nitpick {Z}건 (선택적 개선)
 
-산출물: {$2}
+산출물: {$OUT}
 
 핵심 Blocker {상위 3건 요약}:
 - F-X-001: ...

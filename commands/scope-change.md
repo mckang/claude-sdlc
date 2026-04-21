@@ -1,18 +1,20 @@
 ---
-argument-hint: [Plan파일경로] [변경사유]
+argument-hint: [Plan파일|feature이름, 생략 시 current] [변경사유]
 description: Plan의 스코프 변경을 공식 기록 (원본 보존 + 변경 이력 + 영향 분석)
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
 # 스코프 변경 기록
 
-사용자가 `/scope-change <Plan파일> [사유]` 형태로 호출했다.
+사용자가 `/scope-change [Plan|feature이름] [사유]` 형태로 호출했다.
 전체 인자: `$ARGUMENTS`
 
 예시:
 ```
-/scope-change ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md "M2 마일스톤에 SMS 인증 추가 요청"
-/scope-change ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md
+/sdlc:scope-change                                                   # current feature 사용
+/sdlc:scope-change "SMS 인증 추가 요청"                                # current + 사유
+/sdlc:scope-change email-verification "M2 에 SMS 인증 추가"             # 이름 + 사유
+/sdlc:scope-change docs/plans/plan-x.md "사유"                         # 명시 경로
 ```
 
 스코프 변경은 자주 일어나고 추적 안 되면 나중에 "왜 이렇게 됐지?" 하게 됨.
@@ -20,10 +22,56 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 ## 1단계: 인자 파싱
 
-- `$1`: Plan 파일 경로 (필수)
-- `$2`: 변경 사유 (선택, 문자열로 길어도 됨)
+- `$1`: Plan 파일 경로, feature 이름, 또는 변경 사유 (선택)
+- `$2`: 변경 사유 (선택)
 
-Plan 파일 존재 확인. 없으면 중단.
+### Plan 경로 및 사유 분리
+
+```bash
+ARG1="$1"
+ARG2="$2"
+
+is_kebab_name() {
+  # 슬래시·점이 없고 소문자·숫자·하이픈만이면 kebab-case 이름으로 간주
+  [[ "$1" =~ ^[a-z0-9][a-z0-9-]*$ ]]
+}
+
+if [ -z "$ARG1" ]; then
+  # current feature 사용, 사유 없음
+  PLAN_SRC=""
+  REASON=""
+elif [ -f "$ARG1" ]; then
+  PLAN_SRC="$ARG1"
+  REASON="$ARG2"
+elif is_kebab_name "$ARG1"; then
+  PLAN_SRC="$ARG1"  # feature 이름
+  REASON="$ARG2"
+else
+  # $1 이 사유 문자열인 경우
+  PLAN_SRC=""
+  REASON="$ARG1"
+fi
+
+# PLAN 경로 확정
+if [ -z "$PLAN_SRC" ]; then
+  CLAUDE_MD="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
+  NAME=""
+  if [ -f "$CLAUDE_MD" ]; then
+    NAME=$(awk '/^## Current Feature$/{flag=1; next} flag && /^- \*\*이름\*\*:/{sub(/^- \*\*이름\*\*: */, ""); print; exit}' "$CLAUDE_MD")
+  fi
+  if [ -z "$NAME" ]; then
+    echo "❌ Plan 경로 미지정 + Current Feature 없음."
+    exit 1
+  fi
+  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
+elif [ -f "$PLAN_SRC" ]; then
+  PLAN="$PLAN_SRC"
+else
+  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$PLAN_SRC.md"
+fi
+
+test -f "$PLAN" || { echo "❌ Plan 파일 없음: $PLAN"; exit 1; }
+```
 
 ## 2단계: 변경 수집 (사용자 인터랙티브)
 
@@ -68,7 +116,7 @@ Plan 파일 존재 확인. 없으면 중단.
 
 ### 2-3. 변경 사유 (기록용)
 
-이미 `$2` 로 제공됐으면 생략, 없으면:
+이미 `$REASON` 으로 제공됐으면 생략, 없으면:
 ```
 이 변경의 비즈니스 사유는 무엇인가요? 
 (나중에 "왜 이렇게 됐지?" 추적하는 데 사용)
@@ -117,7 +165,7 @@ T-shirt size 합산:
 
 ```bash
 mkdir -p ${CLAUDE_PROJECT_DIR}/docs/plans/archive
-cp ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md ${CLAUDE_PROJECT_DIR}/docs/plans/archive/email-verification-20260421-1430.md
+cp ${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md ${CLAUDE_PROJECT_DIR}/docs/plans/archive/plan-email-verification-20260421-1430.md
 ```
 
 ## 5단계: Plan 수정
@@ -167,7 +215,7 @@ Plan 상단에 "## 🔄 변경 이력" 섹션이 없으면 생성, 있으면 맨
   - 마일스톤: M2 목표 +1주 지연 (주 4 → 주 5)
   - 크리티컬 패스: 변경 없음 (SMS는 병렬)
   - 예상 공수: +M (3일)
-- **원본 백업**: [archive/email-verification-20260421-1430.md](archive/email-verification-20260421-1430.md)
+- **원본 백업**: [archive/plan-email-verification-20260421-1430.md](archive/plan-email-verification-20260421-1430.md)
 
 ### 2026-04-15 10:00 — Change #2
 - ...
@@ -191,7 +239,7 @@ Plan 상단에 "## 🔄 변경 이력" 섹션이 없으면 생성, 있으면 맨
 # Scope Change #3: SMS 인증 추가
 
 - **날짜**: 2026-04-21 14:30
-- **Plan**: ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md
+- **Plan**: ${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md
 - **유형**: 추가
 - **긴급도**: 🟡 중요
 
@@ -222,9 +270,9 @@ Plan 상단에 "## 🔄 변경 이력" 섹션이 없으면 생성, 있으면 맨
 - [ ] E2-S1 (기존 이메일 발송)과의 조정
 
 ## 관련 링크
-- 원본 Plan 백업: [archive/email-verification-20260421-1430.md](../archive/email-verification-20260421-1430.md)
+- 원본 Plan 백업: [archive/plan-email-verification-20260421-1430.md](../archive/plan-email-verification-20260421-1430.md)
 - 요청 meeting: [${CLAUDE_PROJECT_DIR}/docs/meetings/sms-2fa-request.md](../../meetings/sms-2fa-request.md)
-- 의존성 그래프 갱신: [email-verification.deps.md](../email-verification.deps.md)
+- 의존성 그래프 갱신: [plan-email-verification.deps.md](../plan-email-verification.deps.md)
 ```
 
 ## 8단계: Plan 상단 스냅샷 업데이트
@@ -249,8 +297,8 @@ Change #3 (2026-04-21)
 - 크리티컬 패스: 변경 없음 (병렬)
 - 예상 공수: +M (3일)
 
-백업: ${CLAUDE_PROJECT_DIR}/docs/plans/archive/email-verification-20260421-1430.md
-상세 리포트: ${CLAUDE_PROJECT_DIR}/docs/plans/scope-changes/email-verification-003.md
+백업: ${CLAUDE_PROJECT_DIR}/docs/plans/archive/plan-email-verification-20260421-1430.md
+상세 리포트: ${CLAUDE_PROJECT_DIR}/docs/plans/scope-changes/plan-email-verification-003.md
 
 다음 단계 제안:
 1. 영향받는 팀에 공지 (Slack·이메일)

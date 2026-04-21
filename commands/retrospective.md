@@ -1,29 +1,57 @@
 ---
-argument-hint: [Plan파일경로] [산출물경로] [--format=kpt|4l]
+argument-hint: [Plan|feature이름, 생략 시 current] [산출물경로, 생략 시 자동] [--format=kpt|4l]
 description: 완료된 Plan에 대해 KPT 또는 4L 포맷의 회고 세션 진행
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
 # 회고 (Retrospective) 세션
 
-사용자가 `/retrospective <Plan파일경로> <산출물경로> [--format=kpt|4l]` 형태로 호출했다.
+사용자가 `/retrospective [Plan|feature이름] [산출물경로] [--format=kpt|4l]` 형태로 호출했다.
 전체 인자: `$ARGUMENTS`
 
 예시:
 ```
-/retrospective ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md ${CLAUDE_PROJECT_DIR}/docs/retrospectives/email-verification.md
-/retrospective ${CLAUDE_PROJECT_DIR}/docs/plans/checkout-v2.md ${CLAUDE_PROJECT_DIR}/docs/retrospectives/checkout-v2.md --format=4l
+/sdlc:retrospective                                          # current feature + 자동 산출물
+/sdlc:retrospective checkout-v2 --format=4l                  # feature 이름 + 포맷
+/sdlc:retrospective docs/plans/plan-x.md docs/retrospectives/retro-x.md   # 명시 경로
 ```
 
 ## 1단계: 인자 파싱
 
-- `$1`: 회고 대상 Plan 경로 (필수)
-- `$2`: 회고 산출물 저장 경로 (필수)
+- `$1`: Plan 파일 경로 또는 feature 이름 (선택 — 생략 시 current feature)
+- `$2`: 회고 산출물 저장 경로 (선택 — 생략 시 `docs/retrospectives/retro-<name>.md`)
 - 포맷 플래그 (선택):
   - `--format=kpt` (기본) — Keep / Problem / Try
   - `--format=4l` — Liked / Learned / Lacked / Longed For
 
-Plan 파일 존재 확인. 없으면 중단.
+### Plan 경로 및 산출물 경로 resolve
+
+```bash
+ARG1="$1"
+ARG2="$2"
+
+if [ -z "$ARG1" ] || [[ "$ARG1" == --* ]]; then
+  CLAUDE_MD="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
+  NAME=""
+  if [ -f "$CLAUDE_MD" ]; then
+    NAME=$(awk '/^## Current Feature$/{flag=1; next} flag && /^- \*\*이름\*\*:/{sub(/^- \*\*이름\*\*: */, ""); print; exit}' "$CLAUDE_MD")
+  fi
+  if [ -z "$NAME" ]; then echo "❌ Plan 경로 미지정 + Current Feature 없음."; exit 1; fi
+  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
+elif [ -f "$ARG1" ]; then
+  PLAN="$ARG1"; NAME=$(basename "$PLAN" .md | sed 's/^plan-//')
+else
+  NAME="$ARG1"; PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
+fi
+test -f "$PLAN" || { echo "❌ Plan 파일 없음: $PLAN"; exit 1; }
+
+if [ -z "$ARG2" ] || [[ "$ARG2" == --* ]]; then
+  OUT="${CLAUDE_PROJECT_DIR}/docs/retrospectives/retro-$NAME.md"
+else
+  OUT="$ARG2"
+fi
+mkdir -p "$(dirname "$OUT")"
+```
 
 ## 2단계: Plan 분석
 

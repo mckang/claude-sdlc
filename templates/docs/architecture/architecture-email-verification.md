@@ -1,7 +1,7 @@
 # 아키텍처: 사용자 이메일 인증
 
 - **작성일**: 2026-04-20
-- **참조 PRD**: docs/prd/email-verification.md
+- **참조 PRD**: docs/prd/prd-email-verification.md
 - **상태**: approved
 
 ## 1. 개요

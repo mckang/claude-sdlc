@@ -1,27 +1,55 @@
 ---
-argument-hint: [Story ID] [Plan파일경로] [--draft] [--no-push]
+argument-hint: [Story ID] [Plan파일|feature이름, 생략 시 current] [--draft] [--no-push]
 description: Story 완료 후 git 상태 기반 PR 본문·제목·커밋 메시지 자동 생성
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
 # Story PR 생성
 
-사용자가 `/pr <StoryID> <Plan파일> [--draft] [--no-push]` 형태로 호출했다.
+사용자가 `/pr <StoryID> [Plan파일|feature이름] [--draft] [--no-push]` 형태로 호출했다.
 전체 인자: `$ARGUMENTS`
 
 예시:
 ```
-/pr E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md
-/pr E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md --draft
-/pr E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md --no-push
+/sdlc:pr E1-S1                                             # current feature 사용
+/sdlc:pr E1-S1 checkout-v2                                 # feature 이름 → plan 경로 resolve
+/sdlc:pr E1-S1 docs/plans/plan-checkout-v2.md              # 명시 경로
+/sdlc:pr E1-S1 --draft                                     # current feature + Draft PR
 ```
 
 ## 1단계: 인자 파싱
 
 - `$1`: Story ID
-- `$2`: Plan 파일 경로
+- `$2`: Plan 파일 경로 또는 feature 이름 (선택 — 생략 시 current feature)
 - `--draft` (선택): Draft PR로 생성
 - `--no-push`: 푸시·PR 생성 없이 **본문과 명령어만** 출력 (가장 안전)
+
+### Plan 파일 resolve (story.md와 동일 패턴)
+
+```bash
+STORY_ID="$1"
+ARG2="$2"
+# 플래그는 $2 가 아닐 수 있으니 실제 파싱 시 --로 시작하면 ARG2 를 빈 값으로 처리
+
+if [ -z "$ARG2" ] || [[ "$ARG2" == --* ]]; then
+  CLAUDE_MD="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
+  NAME=""
+  if [ -f "$CLAUDE_MD" ]; then
+    NAME=$(awk '/^## Current Feature$/{flag=1; next} flag && /^- \*\*이름\*\*:/{sub(/^- \*\*이름\*\*: */, ""); print; exit}' "$CLAUDE_MD")
+  fi
+  if [ -z "$NAME" ]; then
+    echo "❌ Plan 경로 미지정 + Current Feature 없음."
+    exit 1
+  fi
+  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
+elif [ -f "$ARG2" ]; then
+  PLAN="$ARG2"
+else
+  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$ARG2.md"
+fi
+
+test -f "$PLAN" || { echo "❌ Plan 파일이 없습니다: $PLAN"; exit 1; }
+```
 
 **기본 모드 선택**:
 - 기본은 `--no-push` 처럼 동작: 실제 push·PR 생성은 하지 않고 사용자에게 명령어 제시
@@ -107,7 +135,7 @@ scope 추출 규칙:
 
 **ID**: E1-S1
 **제목**: 토큰 테이블 마이그레이션
-**Plan**: [${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md](${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md)
+**Plan**: [${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md](${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md)
 **크기**: M
 
 ## 🎯 변경 요약
@@ -132,7 +160,7 @@ scope 추출 규칙:
 - [x] 단위 테스트 통과
 - [x] 린트·타입체크 통과
 - [x] 코드 리뷰 준비
-- [x] 문서 업데이트 (`${CLAUDE_PROJECT_DIR}/docs/architecture/email-verification.md` 4장)
+- [x] 문서 업데이트 (`${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md` 4장)
 - [ ] 스테이징 배포 (PR 머지 후 자동)
 
 ## 📦 변경된 파일
@@ -144,7 +172,7 @@ scope 추출 규칙:
 src/main/resources/db/migration/V020__... | +23
 src/main/resources/db/migration/V021__... | +45
 src/test/.../MigrationIntegrationTest.java | +52
-${CLAUDE_PROJECT_DIR}/docs/architecture/email-verification.md   | -18 +22
+${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md   | -18 +22
 ```
 
 ## 🧪 테스트
@@ -164,9 +192,9 @@ ${CLAUDE_PROJECT_DIR}/docs/architecture/email-verification.md   | -18 +22
 
 ## 🔗 관련 링크
 
-- PRD: [${CLAUDE_PROJECT_DIR}/docs/prd/email-verification.md](${CLAUDE_PROJECT_DIR}/docs/prd/email-verification.md)
-- 아키텍처: [${CLAUDE_PROJECT_DIR}/docs/architecture/email-verification.md](${CLAUDE_PROJECT_DIR}/docs/architecture/email-verification.md)
-- 의존성 그래프: [${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.deps.md](${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.deps.md)
+- PRD: [${CLAUDE_PROJECT_DIR}/docs/prd/prd-email-verification.md](${CLAUDE_PROJECT_DIR}/docs/prd/prd-email-verification.md)
+- 아키텍처: [${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md](${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md)
+- 의존성 그래프: [${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.deps.md](${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.deps.md)
 
 ## 🚦 리뷰어 체크포인트
 
@@ -184,7 +212,7 @@ ${CLAUDE_PROJECT_DIR}/docs/architecture/email-verification.md   | -18 +22
 ---
 
 🤖 Generated with Claude Code (meeting-system v7)
-Story: E1-S1 | Plan: email-verification.md
+Story: E1-S1 | Plan: plan-email-verification.md
 ```
 
 ## 7단계: 커밋 메시지 정리 제안 (선택)
@@ -202,7 +230,7 @@ feat(auth): E1-S1 토큰 기반 인증 스키마
 - 부분 인덱스로 활성 토큰만 빠른 조회
 - 온라인 마이그레이션 안전성 검증
 
-Refs: ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md#E1-S1
+Refs: ${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md#E1-S1
 Story-Size: M
 ```
 
@@ -300,7 +328,7 @@ gh pr create --body-file ${CLAUDE_PROJECT_DIR}/docs/pr-drafts/E1-S1.md --base ma
 
 - Story complete 직후 바로 실행하는 흐름 권장:
   ```
-  /story complete E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md
-  /pr E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md
+  /story complete E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md
+  /pr E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md
   ```
 - 팀마다 브랜치·PR 관례 다를 수 있음 → `${CLAUDE_PROJECT_DIR}/docs/guides/development-workflow.md` 에 팀 규칙 명시 권장

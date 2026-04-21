@@ -1,33 +1,70 @@
 ---
-argument-hint: [start|verify|complete] [Story ID] [Plan 파일]
+argument-hint: [start|verify|complete] [Story ID] [Plan파일 또는 feature이름, 생략 시 current]
 description: Story 단위 개발 사이클 (킥오프·검증·완료) 진행
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
 # Story 개발 사이클 명령
 
-사용자가 `/story <단계> <StoryID> <Plan파일>` 형태로 호출했다.
+> **입력 전제**: `/sdlc:plan` 산출물(`docs/plans/plan-<name>.md`)을 사용한다.
+> `start` 단계는 해당 feature 의 `docs/prd/prd-<name>.md` 와 `docs/architecture/architecture-<name>.md` 를
+> 참조로 자동 로드하여 구현 맥락을 수립한다 (존재할 경우).
+
+사용자가 `/story <단계> <StoryID> [Plan파일|feature이름]` 형태로 호출했다.
 전체 인자: `$ARGUMENTS`
 
 예시:
 ```
-/story start E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md
-/story verify E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md
-/story complete E1-S1 ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md
+/sdlc:story start E1-S1                      # current feature 사용
+/sdlc:story start E1-S1 checkout-v2          # feature 이름 → plan 경로 resolve
+/sdlc:story start E1-S1 docs/plans/plan-checkout-v2.md   # 명시 경로
 ```
 
 ## 1단계: 인자 파싱
 
 - `$1`: 단계 (`start` | `verify` | `complete`)
 - `$2`: Story ID (예: `E1-S1`)
-- `$3`: Plan 파일 경로
+- `$3`: Plan 파일 경로 또는 feature 이름 (선택 — 생략 시 current feature)
+
+### Plan 파일 경로 확정
+
+```bash
+STEP="$1"
+STORY_ID="$2"
+ARG3="$3"
+
+if [ -z "$ARG3" ]; then
+  # Current Feature 로부터 이름 resolve
+  CLAUDE_MD="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
+  NAME=""
+  if [ -f "$CLAUDE_MD" ]; then
+    NAME=$(awk '/^## Current Feature$/{flag=1; next} flag && /^- \*\*이름\*\*:/{sub(/^- \*\*이름\*\*: */, ""); print; exit}' "$CLAUDE_MD")
+  fi
+  if [ -z "$NAME" ]; then
+    echo "❌ Plan 경로 미지정 + Current Feature 없음. /sdlc:feature <이름> 먼저 실행하세요."
+    exit 1
+  fi
+  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
+  echo "ℹ️  Current Feature 사용: $NAME"
+elif [ -f "$ARG3" ]; then
+  # 존재하는 파일 경로
+  PLAN="$ARG3"
+  NAME=$(basename "$PLAN" .md | sed 's/^plan-//')
+else
+  # kebab-case 이름으로 해석
+  NAME="$ARG3"
+  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
+fi
+
+test -f "$PLAN" || { echo "❌ Plan 파일이 없습니다: $PLAN"; exit 1; }
+```
 
 단계가 잘못됐으면 안내하고 중단:
 ```
 올바른 호출법:
-/story start <StoryID> <Plan경로>      — Story 킥오프 (구현 전 설계 확인)
-/story verify <StoryID> <Plan경로>     — AC·DoD·테스트 검증
-/story complete <StoryID> <Plan경로>   — Plan 업데이트 + 완료 보고
+/sdlc:story start <StoryID> [name|plan경로]      — Story 킥오프
+/sdlc:story verify <StoryID> [name|plan경로]     — AC·DoD·테스트 검증
+/sdlc:story complete <StoryID> [name|plan경로]   — Plan 업데이트 + 완료 보고
 ```
 
 ## 2단계: Plan 읽고 Story 추출
@@ -79,7 +116,7 @@ git branch --show-current
 
 #### 3-A-1: 선행 조건 체크
 
-- **의존성 확인**: `${CLAUDE_PROJECT_DIR}/docs/plans/<name>.deps.md` 가 있으면 읽고, 이 Story의 선행 의존성이 모두 완료(`[x]`) 됐는지 확인
+- **의존성 확인**: `${CLAUDE_PROJECT_DIR}/docs/plans/plan-<name>.deps.md` 가 있으면 읽고, 이 Story의 선행 의존성이 모두 완료(`[x]`) 됐는지 확인
 - 미완 의존성이 있으면 **경고**하고 계속할지 묻기:
   ```
   ⚠️ 선행 의존성 미완:
@@ -368,7 +405,7 @@ Plan 파일에서 해당 Story의:
 - src/test/java/.../MigrationIntegrationTest.java
 
 **수정 (1개)**:
-- ${CLAUDE_PROJECT_DIR}/docs/architecture/email-verification.md (4장 "데이터 모델"에 실제 컬럼명 반영)
+- ${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-email-verification.md (4장 "데이터 모델"에 실제 컬럼명 반영)
 
 ## 신규 의존성
 없음
@@ -391,16 +428,16 @@ feat(auth): E1-S1 인증 토큰 DB 스키마
 - 인덱스: 사용자별·만료 기반 부분 인덱스
 - 마이그레이션 온라인 적용 가능 확인
 
-Refs: ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md#E1-S1
+Refs: ${CLAUDE_PROJECT_DIR}/docs/plans/plan-email-verification.md#E1-S1
 ```
 
 ## 다음 Story 제안
 
-의존성 그래프(.deps.md) 기준 다음 후보:
+의존성 그래프(plan-<name>.deps.md) 기준 다음 후보:
 - **E1-S2: 토큰 생성·검증 서비스** (E1-S1 블로킹 해제됨, 담당: backend)
 - **E1-S3: 인증 완료 이벤트 발행** (병렬 가능, 담당: backend)
 
-`/story start E1-S2 ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md` 로 시작하세요.
+`/sdlc:story start E1-S2` 로 시작하세요 (current feature 사용).
 ```
 
 #### 3-C-5: 커밋 · 머지 · 브랜치 정리 (완료 보고 직후)

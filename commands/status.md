@@ -1,29 +1,54 @@
 ---
-argument-hint: [Plan파일경로] [--update]
+argument-hint: [Plan파일|feature이름, 생략 시 current] [--update]
 description: Plan 문서의 진행 상황을 집계하고 요약 리포트 출력 (--update 옵션 시 Plan에 스냅샷 반영)
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
 # Plan 진행 상황 확인
 
-사용자가 `/status <Plan파일경로> [--update]` 형태로 호출했다.
+사용자가 `/status [Plan|feature이름] [--update]` 형태로 호출했다.
 전체 인자: `$ARGUMENTS`
 
 예시:
 ```
-/status ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md
-/status ${CLAUDE_PROJECT_DIR}/docs/plans/email-verification.md --update
+/sdlc:status                                        # current feature 사용
+/sdlc:status --update                               # current + 스냅샷 반영
+/sdlc:status checkout-v2                            # feature 이름
+/sdlc:status docs/plans/plan-checkout-v2.md         # 명시 경로
 ```
 
 ## 1단계: 인자 파싱
 
-- `$1`: Plan 파일 경로 (필수)
-- `$2`: `--update` 플래그 (선택) — 있으면 Plan 파일에 스냅샷 섹션 갱신
+- `$1`: Plan 파일 경로 또는 feature 이름 (선택 — 생략 시 current feature)
+- `$2` (또는 `$1` 이 플래그인 경우): `--update` 플래그 (선택)
 
-파일 존재 확인. 없으면 중단하고 사용 가능한 Plan 목록 보여주기:
+### Plan 경로 resolve
 
 ```bash
-ls ${CLAUDE_PROJECT_DIR}/docs/plans/*.md 2>/dev/null
+ARG1="$1"
+ARG2="$2"
+
+if [ -z "$ARG1" ] || [[ "$ARG1" == --* ]]; then
+  # current feature 사용. $1 이 플래그면 $2 대신 $1 로 처리.
+  [[ "$ARG1" == --* ]] && ARG2="$ARG1"
+  CLAUDE_MD="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
+  NAME=""
+  if [ -f "$CLAUDE_MD" ]; then
+    NAME=$(awk '/^## Current Feature$/{flag=1; next} flag && /^- \*\*이름\*\*:/{sub(/^- \*\*이름\*\*: */, ""); print; exit}' "$CLAUDE_MD")
+  fi
+  if [ -z "$NAME" ]; then
+    echo "❌ Plan 경로 미지정 + Current Feature 없음. 사용 가능한 Plan 목록:"
+    ls "${CLAUDE_PROJECT_DIR}/docs/plans/"plan-*.md 2>/dev/null || echo "  (없음)"
+    exit 1
+  fi
+  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
+elif [ -f "$ARG1" ]; then
+  PLAN="$ARG1"
+else
+  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$ARG1.md"
+fi
+
+test -f "$PLAN" || { echo "❌ Plan 파일 없음: $PLAN"; exit 1; }
 ```
 
 ## 2단계: Plan 파일 파싱
@@ -179,7 +204,7 @@ Task:   ██████████░░░░░  28/52 (54%)
 
 ## 5단계: --update 플래그 처리
 
-`$2`가 `--update` 라면, Plan 파일에 다음 섹션을 추가·갱신한다:
+`$ARG2` 가 `--update` 라면, `$PLAN` 파일에 다음 섹션을 추가·갱신한다:
 
 ### Plan 파일 내 스냅샷 위치
 

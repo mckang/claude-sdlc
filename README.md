@@ -1,6 +1,6 @@
 # sdlc — Claude Code SDLC Plugin
 
-11 개 슬래시 커맨드와 21 명의 팀 페르소나로 아이디어→릴리스→회고 전체 생명주기를 지원하는 Claude Code 플러그인.
+14 개 슬래시 커맨드와 21 명의 팀 페르소나로 아이디어→릴리스→회고 전체 생명주기를 지원하는 Claude Code 플러그인.
 
 ## 설치
 
@@ -39,30 +39,37 @@ claude --plugin-dir /path/to/sdlc-plugin
 # 1) 최초 1회: 프로젝트 초기화
 /sdlc:init
 
-# 2) 요구사항·아키텍처 작성 (docs/prd/, docs/architecture/)
+# 2) Feature 수집 — CLAUDE.md 에 Current Feature 자동 등록
+/sdlc:feature checkout-v2
 
-# 3) Plan 생성
-/sdlc:plan docs/prd/feature.md docs/architecture/feature.md docs/plans/feature.md
-
-# 4) Story 개발 사이클
-/sdlc:story start E1-S1 docs/plans/feature.md
+# 3~7) 이름 인자 생략 시 Current Feature 자동 사용
+/sdlc:prd
+/sdlc:architecture
+/sdlc:plan
+/sdlc:story start E1-S1
 # ... 구현 ...
-/sdlc:story verify E1-S1 docs/plans/feature.md
-/sdlc:story complete E1-S1 docs/plans/feature.md
+/sdlc:story verify E1-S1
+/sdlc:story complete E1-S1
+/sdlc:pr E1-S1
 
-# 5) PR 본문 생성
-/sdlc:pr E1-S1 docs/plans/feature.md
+# 다른 feature 로 전환하려면 /sdlc:feature <다른이름> 재호출
 ```
 
-## 커맨드 (11 + 1)
+산출물 파일명 규약: `docs/<type>/<type>-<name>.md`
+(예: `docs/plans/plan-checkout-v2.md`, `docs/prd/prd-checkout-v2.md`)
+
+## 커맨드 (14 + 1)
 
 | 커맨드 | 목적 | 빈도 |
 |---|---|---|
 | `/sdlc:init` | 프로젝트 초기화 (docs 트리, 표준 설치) | 프로젝트당 1회 |
+| `/sdlc:feature` | 만들고 싶은 것을 대화로 받아 기능 리스트로 정리 (반~1페이지) | 기능 시작 시 |
+| `/sdlc:prd` | feature → 공식 PRD 생성 | 기능 시작 시 |
+| `/sdlc:architecture` | PRD → 아키텍처 + 표준 링크 | 기능 시작 시 |
 | `/sdlc:plan` | Epic→Story→Task 분해 | 기능 시작 시 |
 | `/sdlc:story` | Story 킥오프/검증/완료 | Story마다 3회 |
 | `/sdlc:pr` | PR 본문·커밋 메시지 생성 | Story마다 1회 |
-| `/sdlc:meeting` | 페르소나 기반 팀 토론 | 주 1-2회 |
+| `/sdlc:meeting` | 범용 팀 토론 (feature/prd/architecture 외 토픽) | 주 1-2회 |
 | `/sdlc:standup` | 일일 스탠드업 리포트 | 매일 |
 | `/sdlc:status` | Plan 진행 상황 집계 | 매일 |
 | `/sdlc:scope-change` | 스코프 변경 공식 기록 | 필요 시 |
@@ -85,12 +92,13 @@ claude --plugin-dir /path/to/sdlc-plugin
 
 ## 설치되는 문서 구조
 
-`/sdlc:init` 을 실행하면 사용자 프로젝트에 다음이 생성된다:
+`/sdlc:init` 을 실행하면 사용자 프로젝트에 다음이 생성된다. 파일명 규약: **`<type>-<name>.md`**.
 
 ```
 docs/
-├── prd/                    # 요구사항 (사용자 작성)
-├── architecture/           # 설계 (사용자 작성)
+├── features/               # feature-<name>.md  (/sdlc:feature 결과)
+├── prd/                    # prd-<name>.md      (/sdlc:prd 결과)
+├── architecture/           # architecture-<name>.md  (/sdlc:architecture 결과)
 ├── plans/                  # Plan 문서
 │   ├── archive/            # 스코프 변경 시 원본 백업
 │   └── scope-changes/      # 변경 상세 리포트
@@ -125,6 +133,8 @@ docs/
 
 ## 버전
 
+- **v1.1.0** — `/sdlc:feature`, `/sdlc:prd`, `/sdlc:architecture` 3개 커맨드 추가로 워크플로우 정형화. `docs/features/` 디렉토리 도입. **산출물 파일명 규약 변경**: `docs/<type>/<name>.md` → `docs/<type>/<type>-<name>.md` (breaking — 기존 프로젝트는 rename 필요). **Current Feature 메커니즘**: `/sdlc:feature` 가 CLAUDE.md 에 자동 등록, 후속 커맨드는 이름 인자 생략 시 이를 사용. 설계서: `docs/superpowers/specs/2026-04-21-sdlc-workflow-design.md`.
+- **v1.0.2** — `/sdlc:init` step 5 에 프로젝트 오너 대화식 프롬프트 추가.
 - **v1.0.1** — marketplace.json `source` 스키마 수정 (`"."` → `"./"`).
 - **v1.0.0** — 최초 릴리스. 11개 커맨드 + 21개 페르소나 + 25개 표준 + 샘플 PRD/아키텍처.
 

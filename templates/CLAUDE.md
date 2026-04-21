@@ -4,9 +4,11 @@
 
 ## 1. 맥락 로딩 (세션 시작 시)
 프로젝트 작업을 시작할 때 반드시 다음을 먼저 읽는다:
-- `docs/plans/<현재 feature>.md` — 현재 Plan
-- `docs/prd/<feature>.md` — 요구사항
-- `docs/architecture/<feature>.md` — 설계
+- `CLAUDE.md` 의 `## Current Feature` 섹션 — 현재 작업 중인 feature 이름 (`<name>`)
+- `docs/plans/plan-<name>.md` — 현재 Plan
+- `docs/prd/prd-<name>.md` — 요구사항
+- `docs/architecture/architecture-<name>.md` — 설계
+- `docs/features/feature-<name>.md` — 최초 아이디어
 - `docs/standards/` — 스택 관련 표준
 
 ## 2. Story 단위 작업
@@ -48,18 +50,24 @@ Story 완료 시 `/sdlc:pr` 로 본문 생성. 기본은 `--no-push` (사용자 
 
 ```
 /sdlc:init                                         # 최초 1회
-/sdlc:plan <PRD> <Arch> <Plan>                     # Epic→Story→Task 분해
-/sdlc:story start|verify|complete <ID> <Plan>      # Story 사이클
-/sdlc:meeting <참석자> | <주제> | <산출물>         # 토론
-/sdlc:standup <Plan>                               # 스탠드업
-/sdlc:status <Plan> [--update]                     # 진행 상황
-/sdlc:pr <StoryID> <Plan> [--draft|--no-push]      # PR
-/sdlc:scope-change <Plan> [사유]                   # 스코프 변경
-/sdlc:plan-review <Plan> <산출물>                  # Plan 리뷰
-/sdlc:retrospective <Plan> <산출물> [--format=...] # 회고
-/sdlc:onboard [--role=...] [--feature=...]        # 온보딩
-/sdlc:roles                                        # 페르소나 목록
+/sdlc:feature <이름>                                # 대화로 feature 수집 + current 자동 등록
+/sdlc:prd [이름]                                    # feature → 공식 PRD (생략 시 current)
+/sdlc:architecture [이름]                           # PRD → 아키텍처 (생략 시 current)
+/sdlc:plan [이름 또는 <PRD> <Arch> <Plan>]          # Epic→Story→Task 분해
+/sdlc:story start|verify|complete <ID> [이름|Plan] # Story 사이클
+/sdlc:meeting <참석자> | <주제> | <산출물>         # 범용 토론
+/sdlc:standup [이름|Plan]                           # 스탠드업
+/sdlc:status [이름|Plan] [--update]                 # 진행 상황
+/sdlc:pr <StoryID> [이름|Plan] [--draft|--no-push]  # PR
+/sdlc:scope-change [이름|Plan] [사유]               # 스코프 변경
+/sdlc:plan-review [이름|Plan] [산출물]              # Plan 리뷰
+/sdlc:retrospective [이름|Plan] [산출물] [--format=...] # 회고
+/sdlc:onboard [--role=...] [--feature=...]          # 온보딩
+/sdlc:roles                                         # 페르소나 목록
 ```
+
+산출물 파일명 규약: `docs/<type>/<type>-<name>.md`
+Current Feature 는 `/sdlc:feature` 가 CLAUDE.md 의 `## Current Feature` 섹션에 등록한다.
 
 ---
 
