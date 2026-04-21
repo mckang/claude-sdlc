@@ -132,7 +132,7 @@ if [ ! -f "$DEST" ]; then
     # 주의: 템플릿에는 이미 line 45 에 '---' 구분선이 존재한다(빠른 명령 참조 블록 앞).
     # 따라서 단순히 '/^---$/,$d' 로 삭제하면 빠른 명령 참조까지 날아간다.
     # '## 프로젝트 오너' 헤더를 앵커로 삼아, 그 앞의 '---' 와 빈 줄까지 함께 제거.
-    perl -i -0777 -pe 's/\n+---\n+## 프로젝트 오너\b.*\z/\n/s' "$DEST"
+    perl -i -0777 -pe 's/\n+---\n+## 프로젝트 오너\n.*\z/\n/s' "$DEST"
     echo "✓ CLAUDE.md 생성 완료 (오너 섹션 스킵)"
   fi
 fi
@@ -361,7 +361,7 @@ Expected: `0`
 rm -f "$CLAUDE_PROJECT_DIR/CLAUDE.md"
 OWNER_NAME=""
 cp "$CLAUDE_PLUGIN_ROOT/templates/CLAUDE.md" "$CLAUDE_PROJECT_DIR/CLAUDE.md"
-perl -i -0777 -pe 's/\n+---\n+## 프로젝트 오너\b.*\z/\n/s' "$CLAUDE_PROJECT_DIR/CLAUDE.md"
+perl -i -0777 -pe 's/\n+---\n+## 프로젝트 오너\n.*\z/\n/s' "$CLAUDE_PROJECT_DIR/CLAUDE.md"
 tail -5 "$CLAUDE_PROJECT_DIR/CLAUDE.md"
 ```
 
