@@ -43,24 +43,57 @@ if [ ! -f "${CLAUDE_PROJECT_DIR}/docs/architecture/email-verification.md" ]; the
 fi
 ```
 
-## 5단계: CLAUDE.md 처리
+## 5단계: CLAUDE.md 처리 (대화식)
 
-`${CLAUDE_PROJECT_DIR}/CLAUDE.md` 가 **없으면** 템플릿을 복사한다. **있으면** 덮어쓰지 않고 아래와 같은 안내를 출력한다:
+### 5-a. 프로젝트 오너 이름 수집
+
+사용자에게 다음을 **먼저 출력한 뒤 응답을 기다려라**:
 
 ```
-⚠️  기존 CLAUDE.md가 발견되었습니다.
-다음 규칙을 수동으로 병합하시려면 아래 파일을 참고하세요:
-   ${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.md
-
-핵심 규칙: Story 단위 작업, 구현 중 금지, 결정 지점, Plan 갱신, 스코프 변경, 테스트·보안.
+이 프로젝트의 오너(최종 의사결정자) 이름을 알려주세요.
+미팅·토론 중 결정이 필요할 때 Claude 가 이 사람에게 질의합니다.
+(엔터만 치면 스킵)
 ```
+
+사용자 응답 문자열을 `OWNER_NAME` 변수로 보관한다. 응답이 빈 문자열이면 이후의 오너 섹션 처리는 모두 생략한다.
+
+### 5-b. CLAUDE.md 처리 분기
+
+`DEST` 가 존재하지 않으면 템플릿을 복사한 뒤 오너 섹션을 치환/제거.
+`DEST` 가 이미 존재하면 파일을 보존한 채 오너 섹션만 조건부 append.
 
 ```bash
-if [ ! -f "${CLAUDE_PROJECT_DIR}/CLAUDE.md" ]; then
-  cp "${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.md" "${CLAUDE_PROJECT_DIR}/CLAUDE.md"
-  echo "✓ CLAUDE.md 생성 완료"
+DEST="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
+TPL="${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.md"
+
+if [ ! -f "$DEST" ]; then
+  cp "$TPL" "$DEST"
+  if [ -n "$OWNER_NAME" ]; then
+    # sed 구분자를 | 로 써서 이름에 / 가 있어도 안전. & | \ 는 이스케이프.
+    ESCAPED=$(printf '%s' "$OWNER_NAME" | sed 's/[&|\\]/\\&/g')
+    sed -i.bak "s|{NAME}|$ESCAPED|" "$DEST" && rm "$DEST.bak"
+    echo "✓ CLAUDE.md 생성 완료 (오너: $OWNER_NAME)"
+  else
+    # 오너 섹션 블록 전체 제거.
+    # 주의: 템플릿에는 이미 다른 위치(빠른 명령 참조 블록 앞)에 '---' 구분선이 있다.
+    # 단순 '/^---$/,$d' 는 그 구분선부터 삭제해 빠른 명령 참조까지 날려버린다.
+    # '## 프로젝트 오너' 헤더를 앵커로 삼아 그 앞의 '---' 와 빈 줄까지만 제거.
+    perl -i -0777 -pe 's/\n+---\n+## 프로젝트 오너\b.*\z/\n/s' "$DEST"
+    echo "✓ CLAUDE.md 생성 완료 (오너 섹션 스킵)"
+  fi
 else
-  echo "⚠️  기존 CLAUDE.md 유지 — ${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.md 참고해서 수동 병합 권장"
+  if [ -z "$OWNER_NAME" ]; then
+    echo "⚠️  기존 CLAUDE.md 유지 — ${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.md 참고해서 수동 병합 권장"
+  elif grep -q '^## 프로젝트 오너$' "$DEST"; then
+    echo "⚠️  기존 CLAUDE.md 에 이미 '## 프로젝트 오너' 섹션이 있습니다. 수동 확인 권장."
+  else
+    {
+      printf '\n---\n\n## 프로젝트 오너\n'
+      printf -- '- **이름**: %s\n' "$OWNER_NAME"
+      printf -- '- **역할**: 최종 의사결정자. 미팅·토론 중 결정이 필요하면 반드시 이 사용자에게 질의.\n'
+    } >> "$DEST"
+    echo "✓ 기존 CLAUDE.md 에 프로젝트 오너 섹션 append 완료 (오너: $OWNER_NAME)"
+  fi
 fi
 ```
 
