@@ -150,7 +150,114 @@ mkdir -p "$DESIGN_DIR"
 
 ### 5-A. API 트랙 (TRACK_API=1 일 때)
 
-<!-- Task 2에서 채워짐 -->
+#### 참석자
+- 주도: `backend` (`${CLAUDE_PLUGIN_ROOT}/agents/backend.md`)
+- 참석: `architect`, `techlead`
+- 조건부: `security` — PRD 또는 아키텍처에서 인증·권한·암호화 언급 감지 시 포함
+- 진행: `facilitator`
+
+각 페르소나 `.md` 를 `Read` 로 로드해 어조·관점을 반영.
+
+#### 입력 로드
+- `$PRD` 에서 FR 목록 추출
+- `$ARCH` 에서 "API 계약 개요", "데이터 모델", "외부 의존성" 추출
+- (편집 모드면) 기존 `$DESIGN_DIR/api.md` 도 컨텍스트에 포함
+
+#### 회의 라운드
+
+**Round 1 — 엔드포인트 식별 (backend 주도)**
+- FR 하나하나를 HTTP 엔드포인트(또는 이벤트/gRPC 메서드)로 매핑
+- 초기 엔드포인트 표 도출 (method/path/요약/인증 여부)
+- 누락·중복 점검 (architect 교차 확인)
+
+**Round 2 — 엔드포인트 상세 (backend + security)**
+- 각 엔드포인트마다:
+  - Request: path params / query / body 스키마
+  - Response: 성공(200/201) 스키마 + 에러(4xx/5xx) 스키마
+  - 에러 코드 표
+  - 예시 요청·응답 JSON (최소 정상 1건 + 에러 1건)
+  - Rate limit / idempotency / 멱등 키 필요 여부
+- security 가 민감 엔드포인트(로그인·결제·개인정보) 에서 추가 헤더·감사 로그 요구 사항 제기
+
+**Round 3 — 공통 규격 (techlead + backend)**
+- 에러 응답 포맷(코드 체계, trace-id 포함 여부)
+- 인증·권한 규칙(토큰 종류, 스코프)
+- 버전 전략(URL vs header)
+- Rate limit 정책(IP/사용자/토큰 기준)
+
+#### 산출물 Write
+
+`$DESIGN_DIR/api.md` 에 다음 템플릿으로 Write:
+
+```markdown
+# API 설계: {feature 제목}
+
+- **식별자**: $NAME
+- **작성일**: YYYY-MM-DD
+- **참조 PRD**: ../../prd/prd-$NAME.md
+- **참조 아키텍처**: ../../architecture/architecture-$NAME.md
+- **참석자**: backend, architect, techlead, security?, facilitator
+- **상태**: draft
+
+## 엔드포인트 개요
+
+| Method | Path | 요약 | 인증 | 비고 |
+|--------|------|------|------|------|
+| POST | /api/v1/... | ... | Bearer | ... |
+
+## 엔드포인트 상세
+
+### POST /api/v1/...
+- **인증**: Bearer / Basic / None
+- **Request**
+  - path: (있으면)
+  - query: (있으면)
+  - body (JSON):
+    \`\`\`json
+    { "field": "..." }
+    \`\`\`
+- **Response**
+  - `201 Created`:
+    \`\`\`json
+    { "id": "...", "createdAt": "..." }
+    \`\`\`
+  - `400/401/404/409/...` — 에러 코드 표 참조
+- **에러 코드**
+  | 코드 | 상황 | HTTP |
+  | ... | ... | ... |
+- **예시**
+  - 정상 요청·응답 1쌍
+  - 에러 요청·응답 1쌍
+- **비고**: rate limit / idempotency / 멱등 키
+
+### (추가 엔드포인트 반복)
+
+## 공통 규격
+
+### 에러 응답 포맷
+\`\`\`json
+{ "code": "...", "message": "...", "traceId": "..." }
+\`\`\`
+
+### 인증·권한
+- 토큰 종류: ...
+- 스코프: ...
+
+### 버전 전략
+- URL (`/api/v1`) / Header / Query — 선택 근거
+
+### Rate Limit
+- 기준: IP / 사용자 / 토큰
+- 기본 한도: ...
+
+## 오픈 이슈
+- [ ] ...
+
+## 회의 로그
+(전체 회의 발언 헤더·순서 보존해 append)
+```
+
+트랙 종료 시 `✓ API 저장: docs/design/$NAME/api.md → 다음 트랙: ...` 1줄 출력.
 
 ### 5-B. UI 트랙 (TRACK_UI=1 일 때)
 
