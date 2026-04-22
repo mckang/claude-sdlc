@@ -77,11 +77,13 @@ test -f "$ARCH" || { echo "❌ Architecture 없음: $ARCH (선행: /sdlc:archite
 
 ### 3-a. frontend 감지
 
-`$ARCH` 를 `Read` 해서 다음 키워드 중 하나라도 있으면 `UI_RECOMMENDED=1`:
-- 기술 스택 섹션 내: `React`, `Next.js`, `Vue`, `Svelte`, `SwiftUI`, `Jetpack Compose`, `Flutter`, `frontend`, `UI`
-- 컴포넌트 섹션 또는 본문: `화면`, `페이지`, `UI`, `프론트엔드`
+`$ARCH` 를 `Read` 해서 다음 조건 중 하나라도 만족하면 `UI_RECOMMENDED=1`:
+- **기술 스택 섹션 행 안에** 다음 토큰 중 하나: `React`, `Next.js`, `Vue`, `Svelte`, `SwiftUI`, `Jetpack Compose`, `Flutter`, `frontend`
+- **본문 전체에서** 다음 단어 중 하나: `화면`, `페이지`, `프론트엔드`
 
 감지 결과는 메뉴의 (추천) 배지와 최종 판단 힌트에만 사용. **자동 실행 금지**.
+
+> Note: 과거에 포함되었던 단독 `UI` 토큰은 거의 모든 아키텍처 문서(표·약어·API 설명 등)에 매칭돼 의미 없어지므로 제외. 필요하면 "화면"·"페이지"·"프론트엔드" 한국어 단어로 감지.
 
 ### 3-b. 메뉴 출력
 
@@ -218,3 +220,4 @@ Feature: {제목}
 - 플래그 조합 파싱 실패 시 즉시 종료(`exit 1`) — 반쯤 실행하지 말 것.
 - 회의 전체를 하나의 Claude 응답에서 끝내되, 사용자 결정 지점에선 멈추고 대기.
 - 트랙별 산출물의 최상단 메타 필드는 `- **식별자**: $NAME` 를 반드시 포함 (후속 커맨드 resolve 용).
+- 이 파일에 `<!-- Task N에서 채워짐 -->` HTML 주석이 남아 있으면 안 됨 — 배포 전 `grep "Task .에서 채워짐" commands/design.md` 로 확인.
