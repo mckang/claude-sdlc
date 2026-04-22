@@ -95,6 +95,8 @@ claude --plugin-dir /path/to/sdlc-plugin
 | `/sdlc:auto-story` | `/sdlc:story` 의 start·verify·complete·로컬 머지를 자동 실행 (wrapper) | Story마다 0~1회 |
 | `/sdlc:auto-epic` | Epic 의 Story 들을 의존성 레벨별 병렬 실행 + 순차 fan-in (worktree 기반) | Epic마다 0~1회 |
 
+> ⚠️ **자동화 커맨드는 `/sdlc:story` · `/sdlc:plan` 에 익숙해진 뒤 쓰는 것을 권장**한다. 첫 feature·AC 모호·크리티컬 변경 상황에서는 수동 단계별 실행이 안전하다. 각 커맨드 파일 상단의 "언제 쓸까" 표를 참고.
+
 **보고·운영**
 | 커맨드 | 목적 | 빈도 |
 |---|---|---|
@@ -179,6 +181,7 @@ docs/
 
 ## 버전
 
+- **v1.5.6** — `/sdlc:auto-story` · `/sdlc:auto-epic` 상단에 "⚠️ Power-user" 배너와 "언제 쓸까 / 언제 쓰지 말까" 결정 표 추가. README 의 자동화 섹션에도 주의문 삽입. 동작 변화 없음 — 문서만.
 - **v1.5.5** — 보고서 템플릿 외부화: `story.md` 의 kickoff/verify/complete 3 템플릿과 `plan.md` 의 Plan·deps 2 템플릿을 `${CLAUDE_PLUGIN_ROOT}/templates/reports/{story,plan}/*.md` 로 분리. 커맨드 파일은 "이 템플릿을 Read 해서 쓰라" + "핵심 준수 사항" 만 짧게 기술. story.md 652 → 528 줄 (-124), plan.md 413 → 296 줄 (-117). 동작 변화 없음.
 - **v1.5.4** — 21 명 페르소나에 `tier: essential | specialized` frontmatter 추가 (essential 8, specialized 13). `/sdlc:roles` 는 두 tier 를 분리해 출력, README 도 두 표로 재편. 파일 이동 없음 — 자동 참석자 선정 로직은 essential 기본 + 주제 매칭 시 specialized 합류.
 - **v1.5.3** — `/sdlc:init` 표준 문서 설치가 **on-demand** 로 전환. 이전에는 25 개 표준을 일괄 복사했으나, 이제 사용자가 쓰는 스택(springboot · nextjs · fastapi · frontend · database)만 선택 설치. 나중에 스택이 늘면 `/sdlc:init` 재실행으로 추가(`cp -Rn` — 기존 파일 보존). 기본값(빈 답변)은 `all` 로 이전 동작과 호환.

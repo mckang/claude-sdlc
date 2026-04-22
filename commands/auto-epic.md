@@ -6,6 +6,15 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent
 
 # Auto-Epic — Epic 병렬 실행 + 순차 Fan-in
 
+> **⚠️ Power-user 커맨드 (상위 난도).** 병렬 subagent · git worktree · 순차 fan-in 을 조합한다. `/sdlc:auto-story` 에 먼저 익숙해진 뒤, **Epic 안의 Story 들이 서로 독립적이고 각 Story 의 AC/접근 방법이 이미 확정된 상황**에서 쓰는 것이 안전하다.
+>
+> | 상황 | 권장 |
+> |---|---|
+> | 첫 Epic · 패턴 정착 전 | Story 단위 `/sdlc:story` 또는 `/sdlc:auto-story` 반복 |
+> | deps.md 가 없거나 불완전 | 먼저 `/sdlc:plan` 으로 deps 정리 후 재시도 |
+> | Story 간 공유 파일 편집이 많음 (충돌 위험) | `--sequential` 또는 수동 진행 |
+> | 같은 Epic 안 Story 들이 독립적 · 설계 확정됨 | `/sdlc:auto-epic` 병렬 효과 ↑ |
+
 `/sdlc:auto-story` 는 Story 한 건을 자동 진행한다. 이 커맨드는 **Epic 단위**로 받아 같은 Epic 안의
 독립 Story 들을 **git worktree 에서 격리된 subagent 로 병렬 실행**하고, 각 레벨 완료 시 wrapper 가
 **순차 fan-in** (main 머지 + plan.md 갱신) 을 수행한다.

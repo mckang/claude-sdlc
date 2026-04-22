@@ -6,6 +6,15 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 # Auto-Story — 한 번에 끝까지
 
+> **⚠️ Power-user 커맨드.** 이 커맨드는 `/sdlc:story` 에 익숙해진 뒤 쓰는 것을 권장한다. 자동 진행은 편리하지만 사용자 확인 지점을 건너뛰므로 **첫 feature·불확실한 요구사항·크리티컬 변경**에서는 `/sdlc:story` 를 단계별로 쓰는 편이 안전하다. 아래 표 참고.
+>
+> | 상황 | 권장 |
+> |---|---|
+> | 첫 feature · 코드베이스 이해 중 | `/sdlc:story` (수동) |
+> | AC 가 모호하거나 PRD 에 미결 사항 많음 | `/sdlc:story` (수동) |
+> | 동일 패턴 Story 반복 · 모든 결정 이미 완료 | `/sdlc:auto-story` |
+> | 매 단계 확인하고 싶지만 호출 타이핑이 귀찮음 | `/sdlc:auto-story --interactive` |
+
 `/sdlc:story` 의 3 단계 (start · verify · complete) + 로컬 머지를 자동으로 연속 실행하는 wrapper.
 **기본 동작은 자동 진행**, 사용자 판단이 꼭 필요한 지점에서만 멈춰서 묻는다.
 
