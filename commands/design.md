@@ -230,7 +230,7 @@ mkdir -p "$DESIGN_DIR"
   - 에러 요청·응답 1쌍
 - **비고**: rate limit / idempotency / 멱등 키
 
-### (추가 엔드포인트 반복)
+> Round 1 에서 식별한 각 엔드포인트마다 위 블록(`### METHOD /path` 로 시작)을 반복 출력. "(반복)" 같은 축약 표기는 쓰지 말 것.
 
 ## 공통 규격
 
@@ -392,7 +392,7 @@ mkdir -p "$DESIGN_DIR"
 - 외부 진입점(딥링크·알림 등) 과 이탈점(완료·취소) 명시
 
 **Round 3 — 화면별 와이어프레임 + 요소 + 상태 (ux + frontend)**
-- 화면마다:
+- Round 1 의 각 화면(S1, S2, ...)마다:
   - ASCII 와이어프레임 (박스·구분선 사용, 모바일/데스크톱 구분이 의미 있으면 둘 다)
   - 요소 표: 영역 / 컴포넌트(UI 트랙의 인벤토리 참조) / 상태 / 동작
   - 상태 시나리오: 로딩 / 에러 / 빈 상태 / 성공 피드백
@@ -450,14 +450,14 @@ graph LR
 | 헤더 | HeaderBar | default | 뒤로/메뉴 |
 | 이메일 입력 | Input | default/error | onBlur 검증 |
 | 로그인 버튼 | Button (primary) | default/loading/disabled | onClick → POST /auth/login |
-| 가입 링크 | Link | default/hover | S가입 |
+| 가입 링크 | Link | default/hover | 가입 화면으로 이동 |
 
 ### 상태
 - **로딩**: 버튼 loading, 입력 필드 disabled
 - **에러**: Toast + 입력 필드 aria-invalid
 - **빈 상태**: 해당 없음 (입력 기반 화면)
 
-## 화면 S2: ... (반복)
+> Round 1 에서 정의한 각 화면(S1, S2, ...)마다 위 `## 화면 SN` 블록(와이어프레임 + 요소 표 + 상태)을 반복 출력. "(반복)" 같은 축약 표기는 쓰지 말 것.
 
 ## 오픈 이슈
 - [ ] ...
