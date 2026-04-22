@@ -38,10 +38,7 @@ done
 
 # Current Feature resolve
 if [ -z "$NAME" ]; then
-  CLAUDE_MD="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
-  if [ -f "$CLAUDE_MD" ]; then
-    NAME=$(awk '/^## Current Feature$/{flag=1; next} flag && /^- \*\*이름\*\*:/{sub(/^- \*\*이름\*\*: */, ""); print; exit}' "$CLAUDE_MD")
-  fi
+  NAME=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-current-feature.sh")
   if [ -z "$NAME" ]; then
     cat <<'EOF'
 ❌ feature 이름이 지정되지 않았고, CLAUDE.md 에 Current Feature 도 없습니다.

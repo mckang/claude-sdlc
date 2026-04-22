@@ -30,11 +30,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ```bash
 ARG1="$1"
 if [ -z "$ARG1" ] || [[ "$ARG1" == --* ]]; then
-  CLAUDE_MD="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
-  NAME=""
-  if [ -f "$CLAUDE_MD" ]; then
-    NAME=$(awk '/^## Current Feature$/{flag=1; next} flag && /^- \*\*이름\*\*:/{sub(/^- \*\*이름\*\*: */, ""); print; exit}' "$CLAUDE_MD")
-  fi
+  NAME=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-current-feature.sh")
   if [ -z "$NAME" ]; then echo "❌ Plan 경로 미지정 + Current Feature 없음."; exit 1; fi
   PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
 elif [ -f "$ARG1" ]; then

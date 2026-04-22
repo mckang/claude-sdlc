@@ -31,11 +31,7 @@ ARG2="$2"
 if [ -z "$ARG1" ] || [[ "$ARG1" == --* ]]; then
   # current feature 사용. $1 이 플래그면 $2 대신 $1 로 처리.
   [[ "$ARG1" == --* ]] && ARG2="$ARG1"
-  CLAUDE_MD="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
-  NAME=""
-  if [ -f "$CLAUDE_MD" ]; then
-    NAME=$(awk '/^## Current Feature$/{flag=1; next} flag && /^- \*\*이름\*\*:/{sub(/^- \*\*이름\*\*: */, ""); print; exit}' "$CLAUDE_MD")
-  fi
+  NAME=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-current-feature.sh")
   if [ -z "$NAME" ]; then
     echo "❌ Plan 경로 미지정 + Current Feature 없음. 사용 가능한 Plan 목록:"
     ls "${CLAUDE_PROJECT_DIR}/docs/plans/"plan-*.md 2>/dev/null || echo "  (없음)"

@@ -32,11 +32,7 @@ ARG2="$2"
 # 플래그는 $2 가 아닐 수 있으니 실제 파싱 시 --로 시작하면 ARG2 를 빈 값으로 처리
 
 if [ -z "$ARG2" ] || [[ "$ARG2" == --* ]]; then
-  CLAUDE_MD="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
-  NAME=""
-  if [ -f "$CLAUDE_MD" ]; then
-    NAME=$(awk '/^## Current Feature$/{flag=1; next} flag && /^- \*\*이름\*\*:/{sub(/^- \*\*이름\*\*: */, ""); print; exit}' "$CLAUDE_MD")
-  fi
+  NAME=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-current-feature.sh")
   if [ -z "$NAME" ]; then
     echo "❌ Plan 경로 미지정 + Current Feature 없음."
     exit 1

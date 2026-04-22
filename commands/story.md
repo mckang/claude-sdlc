@@ -35,11 +35,7 @@ ARG3="$3"
 
 if [ -z "$ARG3" ]; then
   # Current Feature 로부터 이름 resolve
-  CLAUDE_MD="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
-  NAME=""
-  if [ -f "$CLAUDE_MD" ]; then
-    NAME=$(awk '/^## Current Feature$/{flag=1; next} flag && /^- \*\*이름\*\*:/{sub(/^- \*\*이름\*\*: */, ""); print; exit}' "$CLAUDE_MD")
-  fi
+  NAME=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-current-feature.sh")
   if [ -z "$NAME" ]; then
     echo "❌ Plan 경로 미지정 + Current Feature 없음. /sdlc:feature <이름> 먼저 실행하세요."
     exit 1

@@ -1,6 +1,6 @@
 {
   "name": "sdlc",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "SDLC support: 15 slash commands and 21 team personas (feature to release to retrospective)",
   "author": {
     "name": "Thomas Kang",
