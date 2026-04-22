@@ -369,7 +369,104 @@ mkdir -p "$DESIGN_DIR"
 
 ### 5-C. Mockup 트랙 (TRACK_MOCKUP=1 일 때)
 
-<!-- Task 4에서 채워짐 -->
+#### 참석자
+- 주도: `ux`
+- 참석: `frontend`, `pm` (유스케이스 매핑 확인)
+- 진행: `facilitator`
+
+#### 입력 로드
+- `$PRD` 에서 페르소나·유스케이스 추출
+- `$DESIGN_DIR/ui.md` 가 있으면 Read — 토큰·컴포넌트 참조
+- (편집 모드면) 기존 `$DESIGN_DIR/mockup.md` 도 컨텍스트에 포함
+
+#### 회의 라운드
+
+**Round 1 — 화면 리스트 도출 (ux + pm)**
+- 유스케이스 하나하나를 화면(들)로 매핑
+- 화면 3-6 개로 수렴 (너무 많으면 Story 단위로 쪼갤 수 있음 — pm 판단)
+- 각 화면에 ID 부여 (S1, S2, ...)
+
+**Round 2 — 화면 흐름도 (ux 주도)**
+- Mermaid `graph LR` 로 화면 간 전이
+- 조건 분기(성공/에러)는 라벨로 표시
+- 외부 진입점(딥링크·알림 등) 과 이탈점(완료·취소) 명시
+
+**Round 3 — 화면별 와이어프레임 + 요소 + 상태 (ux + frontend)**
+- 화면마다:
+  - ASCII 와이어프레임 (박스·구분선 사용, 모바일/데스크톱 구분이 의미 있으면 둘 다)
+  - 요소 표: 영역 / 컴포넌트(UI 트랙의 인벤토리 참조) / 상태 / 동작
+  - 상태 시나리오: 로딩 / 에러 / 빈 상태 / 성공 피드백
+- frontend 가 구현 가능성 교차 확인
+
+#### 산출물 Write
+
+`$DESIGN_DIR/mockup.md` 에 다음 템플릿으로 Write:
+
+```markdown
+# Mockup: {feature 제목}
+
+- **식별자**: $NAME
+- **작성일**: YYYY-MM-DD
+- **참조 PRD**: ../../prd/prd-$NAME.md
+- **참조 UI 디자인 시스템**: ui.md (있을 때)
+- **참석자**: ux, frontend, pm, facilitator
+- **상태**: draft
+
+## 화면 리스트
+
+| ID | 이름 | 유스케이스 | 비고 |
+|----|------|-----------|------|
+| S1 | ... | UC-1, UC-2 | 엔트리 |
+| S2 | ... | ... | ... |
+
+## 화면 흐름
+
+\`\`\`mermaid
+graph LR
+  Entry[딥링크] --> S1[로그인]
+  S1 -->|성공| S2[대시보드]
+  S1 -->|실패| S1
+  S2 --> S3[상세]
+\`\`\`
+
+## 화면 S1: {이름}
+
+### 와이어프레임 (ASCII)
+\`\`\`
++--------------------------------+
+|  Header · 로그인                |
++--------------------------------+
+|  [Email input]                 |
+|  [Password input]              |
+|                                |
+|        [로그인 버튼]            |
+|   계정이 없으신가요? [가입]      |
++--------------------------------+
+\`\`\`
+
+### 요소
+| 영역 | 컴포넌트 | 상태 | 동작 |
+|-----|---------|------|------|
+| 헤더 | HeaderBar | default | 뒤로/메뉴 |
+| 이메일 입력 | Input | default/error | onBlur 검증 |
+| 로그인 버튼 | Button (primary) | default/loading/disabled | onClick → POST /auth/login |
+| 가입 링크 | Link | default/hover | S가입 |
+
+### 상태
+- **로딩**: 버튼 loading, 입력 필드 disabled
+- **에러**: Toast + 입력 필드 aria-invalid
+- **빈 상태**: 해당 없음 (입력 기반 화면)
+
+## 화면 S2: ... (반복)
+
+## 오픈 이슈
+- [ ] ...
+
+## 회의 로그
+(전체 회의 발언 헤더·순서 보존해 append)
+```
+
+트랙 종료 시 `✓ Mockup 저장: docs/design/$NAME/mockup.md → 인덱스 갱신` 1줄 출력.
 
 ## 6단계: README.md 인덱스 생성/갱신
 
