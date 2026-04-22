@@ -16,13 +16,64 @@ allowed-tools: Read, Write, Edit, Bash, Glob
 mkdir -p "${CLAUDE_PROJECT_DIR}/docs"/{features,prd,architecture,plans,plans/archive,plans/scope-changes,meetings,retrospectives,standups,pr-drafts,onboarding,guides,standards}
 ```
 
-## 2단계: 표준 문서 설치
+## 2단계: 표준 문서 설치 (스택 선택)
 
-`${CLAUDE_PLUGIN_ROOT}/templates/docs/standards/` 의 모든 파일을 `${CLAUDE_PROJECT_DIR}/docs/standards/` 로 복사한다. **기존 파일은 덮어쓰지 않는다** (사용자가 수정했을 수 있음).
+이전 버전은 5 개 스택 25 개 표준 문서를 모두 복사했으나, 대부분 프로젝트는 1~2 개 스택만 사용한다. 이제 사용자에게 스택을 묻고 **선택한 것만** 복사한다. 나중에 스택이 늘면 `/sdlc:init` 을 다시 실행해 추가 설치할 수 있다 (`cp -Rn` 은 기존 파일을 덮어쓰지 않음).
+
+### 2-a. 스택 질의
+
+다음을 **먼저 출력한 뒤 응답을 기다려라**:
+
+```
+어떤 스택의 표준 문서를 설치할까요? (복수 선택 가능, 공백 구분)
+
+  1) backend/springboot        Spring Boot · Java · JPA
+  2) backend/nextjs-typescript Next.js · TypeScript
+  3) backend/fastapi           FastAPI · Python
+  4) frontend                  React · Tailwind · Shadcn
+  5) database                  PostgreSQL · MySQL · migrations
+
+  a) 전부 설치
+  s) 스킵 (없이 시작 — 나중에 /sdlc:init 재실행으로 추가 가능)
+
+답변 (예: "1 5", "2 4 5", "a"):
+```
+
+사용자 응답을 `STACK_CHOICES` 변수에 보관한다. **빈 답변은 `a` (전부) 로 해석**.
+
+### 2-b. 토큰 → 디렉터리 매핑
+
+| 토큰 | 디렉터리 |
+|---|---|
+| `1`, `springboot`, `sb` | `backend/springboot` |
+| `2`, `nextjs`, `nx` | `backend/nextjs-typescript` |
+| `3`, `fastapi`, `fa` | `backend/fastapi` |
+| `4`, `frontend`, `fe` | `frontend` |
+| `5`, `database`, `db` | `database` |
+| `a`, `all` | 위 5 개 전부 |
+| `s`, `skip` | 아무것도 복사 안 함 |
+
+알 수 없는 토큰은 경고 1 줄 출력 후 무시. `docs/standards/README.md` (인덱스 파일) 은 선택과 무관하게 **항상** 복사 (`skip` 이 아닌 한).
+
+### 2-c. 선택 디렉터리 복사
 
 ```bash
-cp -Rn "${CLAUDE_PLUGIN_ROOT}/templates/docs/standards/." "${CLAUDE_PROJECT_DIR}/docs/standards/"
+SRC="${CLAUDE_PLUGIN_ROOT}/templates/docs/standards"
+DST="${CLAUDE_PROJECT_DIR}/docs/standards"
+mkdir -p "$DST"
+
+# skip 이 아니면 README(인덱스) 는 항상
+cp -n "$SRC/README.md" "$DST/README.md" 2>/dev/null || true
+
+# Claude 가 STACK_CHOICES 를 해석해 필요한 디렉터리마다 아래 한 쌍을 실행:
+#   mkdir -p "$DST/<dir>"
+#   cp -Rn "$SRC/<dir>/." "$DST/<dir>/"
+# 예를 들어 사용자가 "1 5" 를 선택했으면:
+#   mkdir -p "$DST/backend/springboot" && cp -Rn "$SRC/backend/springboot/." "$DST/backend/springboot/"
+#   mkdir -p "$DST/database"           && cp -Rn "$SRC/database/."           "$DST/database/"
 ```
+
+설치한 디렉터리 목록을 `INSTALLED_STANDARDS` (공백 구분 문자열) 로 기록해 6 단계 완료 요약에 사용한다. 스킵 시 `INSTALLED_STANDARDS=""`.
 
 ## 3단계: 가이드 문서 설치
 
@@ -112,7 +163,7 @@ done
 
 ## 설치된 것
 - `docs/` 트리 (features, prd, architecture, plans, meetings, ...)
-- `docs/standards/` 25개 표준 문서 (backend/frontend/database)
+- `docs/standards/` — 선택한 스택만 (`$INSTALLED_STANDARDS` 기반으로 나열; 스킵했으면 "없음 — 추후 /sdlc:init 재실행으로 추가 가능")
 - `docs/guides/development-workflow.md`
 - CLAUDE.md (기존 없을 때만)
 

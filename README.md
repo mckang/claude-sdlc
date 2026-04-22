@@ -140,11 +140,13 @@ docs/
 ├── pr-drafts/              # /sdlc:pr 본문
 ├── onboarding/             # /sdlc:onboard 문서
 ├── guides/                 # 개발 가이드
-└── standards/              # 25개 스택별 표준
-    ├── backend/{springboot,fastapi,nextjs-typescript}/
-    ├── frontend/
-    └── database/
+└── standards/              # 선택 설치한 스택별 표준 (v1.5.3+)
+    ├── backend/{springboot,fastapi,nextjs-typescript}/   # 선택한 것만
+    ├── frontend/                                          # 선택 시만
+    └── database/                                          # 선택 시만
 ```
+
+`/sdlc:init` 은 **어떤 스택을 쓰는지 묻고 선택한 스택만 복사**한다 (v1.5.3 부터). 나중에 스택이 늘면 `/sdlc:init` 을 다시 실행하면 빠진 것만 채워진다 (`cp -Rn` — 기존 파일은 안 건드림).
 
 `CLAUDE.md` 는 기존 파일이 없으면 자동 생성, 있으면 병합 안내만 한다.
 
@@ -165,6 +167,7 @@ docs/
 
 ## 버전
 
+- **v1.5.3** — `/sdlc:init` 표준 문서 설치가 **on-demand** 로 전환. 이전에는 25 개 표준을 일괄 복사했으나, 이제 사용자가 쓰는 스택(springboot · nextjs · fastapi · frontend · database)만 선택 설치. 나중에 스택이 늘면 `/sdlc:init` 재실행으로 추가(`cp -Rn` — 기존 파일 보존). 기본값(빈 답변)은 `all` 로 이전 동작과 호환.
 - **v1.5.2** — README 커맨드 표를 **Core (7) / Extension (11)** 구조로 재편. 설계 보강·자동화·보고·운영·범용 소분류 추가. `plugin.json` · `marketplace.json` description 에도 Core/Extension 표기 반영. 커맨드·페르소나 추가 없음 (문서만).
 - **v1.5.1** — 11 개 커맨드에 중복되던 `## Current Feature` 파싱 `awk` 블록을 `scripts/resolve-current-feature.sh` 로 분리. 동작 변화 없음 (패턴·출력 동일). 커맨드 총 줄수 -40.
 - **v1.3.0** — `/sdlc:design` 커맨드 추가 (architecture 와 plan 사이의 선택 단계). `--api` · `--ui` · `--mockup` 플래그(또는 `--all`, 또는 대화형 메뉴)로 트랙 선택. 산출물은 `docs/design/<name>/{api,ui,mockup,README}.md` 디렉터리 레이아웃. `/sdlc:plan` 은 design 디렉터리가 있으면 자동 참조하고, 없으면 기존 동작 그대로 유지. 신규 페르소나 없음(기존 21명 활용).
