@@ -96,7 +96,7 @@ PRD 또는 아키텍처 문서에 위 정보가 현저히 부족하면:
 
 ### Design 산출물 자동 감지 (선택)
 
-`${CLAUDE_PROJECT_DIR}/docs/design/$NAME/` 디렉터리가 존재하면 추가 입력으로 로드:
+`${CLAUDE_PROJECT_DIR}/docs/design/$NAME/` 디렉터리가 존재하면 추가 입력으로 로드. 아래 로직은 **실제 bash 실행이 아닌** Claude 의 내부 판단 절차를 기술한다 — 디렉터리 존재 확인과 트랙 목록 산출에 사용.
 
 ```bash
 DESIGN_DIR="${CLAUDE_PROJECT_DIR}/docs/design/$NAME"
@@ -238,13 +238,15 @@ E1-S1-T4: 통합 테스트 작성 (qa, S)
 
 ### 6.1 메인 계획 문서 (`$OUT`)
 
+> **참조 Design 라인 규칙**: design 디렉터리가 없거나 트랙 파일이 하나도 없으면 (즉 `DESIGN_TRACKS` 가 빈 문자열이면) **`참조 Design` 라인 전체를 출력하지 말 것** — 빈 괄호·빈 트랙 문자열 금지.
+
 ```markdown
 # 실행 계획: {제목}
 
 - **작성일**: YYYY-MM-DD
 - **참조 PRD**: {$PRD}
 - **참조 아키텍처**: {$ARCH}
-- **참조 Design**: docs/design/{NAME}/ (트랙: {$DESIGN_TRACKS})   # 디렉터리 존재 시에만 추가, 없으면 이 줄 생략
+- **참조 Design**: docs/design/{NAME}/ (트랙: {$DESIGN_TRACKS})
 - **기술 스택**: {감지된 스택}
 - **상태**: draft | approved | in_progress | done
 
