@@ -175,14 +175,14 @@ if [ ! -f "$CLAUDE_MD" ]; then
   printf '# 프로젝트 가이드\n\n' > "$CLAUDE_MD"
 fi
 
-# 기존 Current Feature 섹션 제거 (있으면)
+# 기존 Current Feature 섹션 제거 (있으면 — 레거시 **이름** 형식도 함께)
 perl -i -0777 -pe 's/\n*## Current Feature\n(?:-[^\n]*\n)*//g' "$CLAUDE_MD"
 
-# 새 Current Feature 섹션 append
+# 새 Current Feature 섹션 append (YAML 스타일 키 — 볼드/한국어 라벨 의존 제거)
 {
   printf '\n## Current Feature\n'
-  printf -- '- **이름**: %s\n' "$NAME"
-  printf -- '- **최종 갱신**: %s\n' "$TODAY"
+  printf -- '- name: %s\n' "$NAME"
+  printf -- '- updated: %s\n' "$TODAY"
 } >> "$CLAUDE_MD"
 
 echo "✓ CLAUDE.md 의 Current Feature 를 '$NAME' 로 갱신"

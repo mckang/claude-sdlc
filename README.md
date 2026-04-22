@@ -181,6 +181,7 @@ docs/
 
 ## 버전
 
+- **v1.5.7** — `CLAUDE.md` 의 `## Current Feature` 섹션 포맷을 YAML 스타일로 변경 (`- **이름**: X` → `- name: X`, `- **최종 갱신**: X` → `- updated: X`). 볼드/한국어 라벨 의존 제거로 사용자가 마크다운 포맷 건드려도 깨지지 않음. `scripts/resolve-current-feature.sh` 는 신·구 두 형식 모두 파싱 (backward compat). 기존 프로젝트는 그대로 동작하며, 다음 `/sdlc:feature` 호출 시 신 형식으로 자동 전환.
 - **v1.5.6** — `/sdlc:auto-story` · `/sdlc:auto-epic` 상단에 "⚠️ Power-user" 배너와 "언제 쓸까 / 언제 쓰지 말까" 결정 표 추가. README 의 자동화 섹션에도 주의문 삽입. 동작 변화 없음 — 문서만.
 - **v1.5.5** — 보고서 템플릿 외부화: `story.md` 의 kickoff/verify/complete 3 템플릿과 `plan.md` 의 Plan·deps 2 템플릿을 `${CLAUDE_PLUGIN_ROOT}/templates/reports/{story,plan}/*.md` 로 분리. 커맨드 파일은 "이 템플릿을 Read 해서 쓰라" + "핵심 준수 사항" 만 짧게 기술. story.md 652 → 528 줄 (-124), plan.md 413 → 296 줄 (-117). 동작 변화 없음.
 - **v1.5.4** — 21 명 페르소나에 `tier: essential | specialized` frontmatter 추가 (essential 8, specialized 13). `/sdlc:roles` 는 두 tier 를 분리해 출력, README 도 두 표로 재편. 파일 이동 없음 — 자동 참석자 선정 로직은 essential 기본 + 주제 매칭 시 specialized 합류.
