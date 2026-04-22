@@ -1,6 +1,6 @@
 # sdlc — Claude Code SDLC Plugin
 
-15 개 슬래시 커맨드와 21 명의 팀 페르소나로 아이디어→릴리스→회고 전체 생명주기를 지원하는 Claude Code 플러그인.
+Core 7 개 + Extension 11 개 슬래시 커맨드와 21 명의 팀 페르소나로 아이디어→릴리스→회고 전체 생명주기를 지원하는 Claude Code 플러그인.
 
 ## 설치
 
@@ -60,7 +60,13 @@ claude --plugin-dir /path/to/sdlc-plugin
 산출물 파일명 규약: `docs/<type>/<type>-<name>.md`
 (예: `docs/plans/plan-checkout-v2.md`, `docs/prd/prd-checkout-v2.md`)
 
-## 커맨드 (15 + 1)
+## 커맨드
+
+커맨드는 **Core** 와 **Extension** 두 갈래로 나뉜다. Core 7 개만 사용해도 아이디어→릴리스 전체 루프가 돈다. Extension 은 필요한 것만 선택적으로 곁들이는 부가 기능이다.
+
+### Core (7) — 아이디어→릴리스 최소 경로
+
+필수. 이 순서가 곧 워크플로우다.
 
 | 커맨드 | 목적 | 빈도 |
 |---|---|---|
@@ -68,19 +74,39 @@ claude --plugin-dir /path/to/sdlc-plugin
 | `/sdlc:feature` | 만들고 싶은 것을 대화로 받아 기능 리스트로 정리 (반~1페이지) | 기능 시작 시 |
 | `/sdlc:prd` | feature → 공식 PRD 생성 | 기능 시작 시 |
 | `/sdlc:architecture` | PRD → 아키텍처 + 표준 링크 | 기능 시작 시 |
-| `/sdlc:design` | API · UI 디자인 시스템 · Mockup 중 선택 트랙 설계 (선택) | 필요 시 |
 | `/sdlc:plan` | Epic→Story→Task 분해 | 기능 시작 시 |
 | `/sdlc:story` | Story 킥오프/검증/완료 | Story마다 3회 |
+| `/sdlc:pr` | PR 본문·커밋 메시지 생성 | Story마다 1회 |
+
+### Extension (11) — 선택·부가
+
+필요한 것만 골라 쓴다. 하나도 안 써도 Core 워크플로우는 정상 동작.
+
+**설계 보강**
+| 커맨드 | 목적 | 빈도 |
+|---|---|---|
+| `/sdlc:design` | API · UI 디자인 시스템 · Mockup 중 선택 트랙 설계 | 필요 시 |
+| `/sdlc:plan-review` | 팀 페르소나 4축 리뷰 | Plan 확정 전 |
+| `/sdlc:scope-change` | 스코프 변경 공식 기록 | 필요 시 |
+
+**자동화 (power user)**
+| 커맨드 | 목적 | 빈도 |
+|---|---|---|
 | `/sdlc:auto-story` | `/sdlc:story` 의 start·verify·complete·로컬 머지를 자동 실행 (wrapper) | Story마다 0~1회 |
 | `/sdlc:auto-epic` | Epic 의 Story 들을 의존성 레벨별 병렬 실행 + 순차 fan-in (worktree 기반) | Epic마다 0~1회 |
-| `/sdlc:pr` | PR 본문·커밋 메시지 생성 | Story마다 1회 |
-| `/sdlc:meeting` | 범용 팀 토론 (feature/prd/architecture 외 토픽) | 주 1-2회 |
+
+**보고·운영**
+| 커맨드 | 목적 | 빈도 |
+|---|---|---|
 | `/sdlc:standup` | 일일 스탠드업 리포트 | 매일 |
 | `/sdlc:status` | Plan 진행 상황 집계 | 매일 |
-| `/sdlc:scope-change` | 스코프 변경 공식 기록 | 필요 시 |
-| `/sdlc:plan-review` | 팀 페르소나 4축 리뷰 | Plan 확정 전 |
 | `/sdlc:retrospective` | KPT/4L 회고 | 프로젝트당 1회 |
 | `/sdlc:onboard` | 새 팀원 온보딩 | 합류 시 |
+
+**범용·참조**
+| 커맨드 | 목적 | 빈도 |
+|---|---|---|
+| `/sdlc:meeting` | 범용 팀 토론 (feature/prd/architecture 외 토픽) | 주 1-2회 |
 | `/sdlc:roles` | 21명 페르소나 목록 | 참조용 |
 
 ## 페르소나 (21)
@@ -139,6 +165,8 @@ docs/
 
 ## 버전
 
+- **v1.5.2** — README 커맨드 표를 **Core (7) / Extension (11)** 구조로 재편. 설계 보강·자동화·보고·운영·범용 소분류 추가. `plugin.json` · `marketplace.json` description 에도 Core/Extension 표기 반영. 커맨드·페르소나 추가 없음 (문서만).
+- **v1.5.1** — 11 개 커맨드에 중복되던 `## Current Feature` 파싱 `awk` 블록을 `scripts/resolve-current-feature.sh` 로 분리. 동작 변화 없음 (패턴·출력 동일). 커맨드 총 줄수 -40.
 - **v1.3.0** — `/sdlc:design` 커맨드 추가 (architecture 와 plan 사이의 선택 단계). `--api` · `--ui` · `--mockup` 플래그(또는 `--all`, 또는 대화형 메뉴)로 트랙 선택. 산출물은 `docs/design/<name>/{api,ui,mockup,README}.md` 디렉터리 레이아웃. `/sdlc:plan` 은 design 디렉터리가 있으면 자동 참조하고, 없으면 기존 동작 그대로 유지. 신규 페르소나 없음(기존 21명 활용).
 - **v1.2.0** — `/sdlc:story` 각 단계(`start`·`verify`·`complete`) 보고서가 `docs/plans/<feature>/<Story-ID>/{kickoff,verify,complete}.md` 로 자동 저장된다. YAML frontmatter(`story_id`, `feature`, `stage`, `saved_at`, `branch`) + 기존 대화 출력 Markdown 본문 포맷. `start`·`complete` 재실행 시 덮어쓰기 확인, `verify` 는 조용히 덮어쓰기. 저장 실패는 핵심 워크플로(브랜치 생성·Plan 갱신)를 막지 않는다.
 - **v1.1.0** — `/sdlc:feature`, `/sdlc:prd`, `/sdlc:architecture` 3개 커맨드 추가로 워크플로우 정형화. `docs/features/` 디렉토리 도입. **산출물 파일명 규약 변경**: `docs/<type>/<name>.md` → `docs/<type>/<type>-<name>.md` (breaking — 기존 프로젝트는 rename 필요). **Current Feature 메커니즘**: `/sdlc:feature` 가 CLAUDE.md 에 자동 등록, 후속 커맨드는 이름 인자 생략 시 이를 사용. **샘플 PRD/아키텍처 제거**: 커맨드가 직접 생성하므로 `email-verification` 샘플 파일은 더 이상 설치되지 않는다.
