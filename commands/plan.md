@@ -94,6 +94,29 @@ PRD 또는 아키텍처 문서에 위 정보가 현저히 부족하면:
 - 사용자에게 "PRD/아키텍처를 먼저 보완하시겠습니까, 아니면 현재 내용으로 진행하겠습니까?" 질의
 - 현재 내용으로 진행하는 경우 Plan 문서에 "**가정**" 섹션에 추정 근거 명시
 
+### Design 산출물 자동 감지 (선택)
+
+`${CLAUDE_PROJECT_DIR}/docs/design/$NAME/` 디렉터리가 존재하면 추가 입력으로 로드:
+
+```bash
+DESIGN_DIR="${CLAUDE_PROJECT_DIR}/docs/design/$NAME"
+DESIGN_TRACKS=""
+if [ -d "$DESIGN_DIR" ]; then
+  for f in api.md ui.md mockup.md; do
+    if [ -f "$DESIGN_DIR/$f" ]; then
+      DESIGN_TRACKS="${DESIGN_TRACKS}${DESIGN_TRACKS:+, }${f%.md}"
+    fi
+  done
+fi
+```
+
+존재하는 파일만 `Read`:
+- `api.md` 가 있으면 → API 엔드포인트 목록을 Story 경계 힌트로 활용 (엔드포인트당 Story/Task 하나 이상)
+- `ui.md` 가 있으면 → 컴포넌트 인벤토리를 frontend Story 의 Task 분해 힌트로 활용
+- `mockup.md` 가 있으면 → 화면 리스트를 유스케이스 매핑 확인용 참조
+
+**디렉터리가 없으면 완전히 무시** — 경고·안내 없이 기존 plan 로직 그대로.
+
 ## 3단계: 스택 감지 및 관련 표준 로드
 
 아키텍처 문서의 "기술 스택" 섹션을 기반으로 `${CLAUDE_PROJECT_DIR}/docs/standards/` 에서 관련 문서 자동 로드:
@@ -221,6 +244,7 @@ E1-S1-T4: 통합 테스트 작성 (qa, S)
 - **작성일**: YYYY-MM-DD
 - **참조 PRD**: {$PRD}
 - **참조 아키텍처**: {$ARCH}
+- **참조 Design**: docs/design/{NAME}/ (트랙: {$DESIGN_TRACKS})   # 디렉터리 존재 시에만 추가, 없으면 이 줄 생략
 - **기술 스택**: {감지된 스택}
 - **상태**: draft | approved | in_progress | done
 
