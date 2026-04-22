@@ -261,7 +261,101 @@ mkdir -p "$DESIGN_DIR"
 
 ### 5-B. UI 트랙 (TRACK_UI=1 일 때)
 
-<!-- Task 3에서 채워짐 -->
+#### 참석자
+- 주도: `ux` (`${CLAUDE_PLUGIN_ROOT}/agents/ux.md`)
+- 참석: `frontend`, `architect` (접근성·성능 교차 검토)
+- 진행: `facilitator`
+
+#### 입력 로드
+- `$PRD` 에서 페르소나·유스케이스 추출
+- `$ARCH` 에서 UI·프론트엔드 관련 언급 추출 (컴포넌트 섹션·기술 스택)
+- (편집 모드면) 기존 `$DESIGN_DIR/ui.md` 도 컨텍스트에 포함
+
+#### 회의 라운드
+
+**Round 1 — 디자인 원칙 (ux 주도)**
+- 이 feature 의 UI 가 지향하는 원칙 2-4 줄 (예: "밀도 높지만 실수 방지", "1차 액션만 강조")
+- 페르소나 분석 결과와 정합성 확인
+
+**Round 2 — 토큰 정의 (ux + frontend)**
+- 색: primary / secondary / semantic(success·warning·danger·info) / neutral 스케일
+- 타이포: 스케일(h1~caption) / 각 스케일의 size·line-height·weight / font family
+- 간격: 4px 또는 8px 기반 스케일 (spacing-1 ~ spacing-12 식)
+- 라운드: 반경 스케일 (radius-sm/md/lg/full)
+- 그림자: 깊이 스케일 (shadow-1 ~ shadow-4)
+- 프로젝트 기존 토큰이 있으면(예: Tailwind config, 기존 DS) 재사용 권장 — 중복 창조 금지
+
+**Round 3 — 컴포넌트 인벤토리 (frontend 주도)**
+- 이 feature 에 필요한 컴포넌트 목록(Button/Input/Select/Modal/Card/Table/Toast/...)
+- 각 컴포넌트: 용도 / variants(primary·secondary·ghost) / state(default·hover·active·disabled·loading) / 접근성 지침(aria, 키보드)
+- 재사용 vs 신규 생성 판단 (architect 교차)
+
+**Round 4 — 접근성 체크리스트 (architect 주도)**
+- WCAG 2.2 AA 기준 핵심 항목만:
+  - 색 대비 ≥ 4.5:1 (body) / 3:1 (large)
+  - 키보드 전용 내비게이션 가능
+  - 포커스 표시 명확
+  - aria-label / role 적절
+  - 동작에 동반되는 시각 외 피드백
+
+#### 산출물 Write
+
+`$DESIGN_DIR/ui.md` 에 다음 템플릿으로 Write:
+
+```markdown
+# UI 디자인 시스템: {feature 제목}
+
+- **식별자**: $NAME
+- **작성일**: YYYY-MM-DD
+- **참조 PRD**: ../../prd/prd-$NAME.md
+- **참조 아키텍처**: ../../architecture/architecture-$NAME.md
+- **참석자**: ux, frontend, architect, facilitator
+- **상태**: draft
+
+## 디자인 원칙
+1. ...
+2. ...
+
+## 토큰
+
+### 색
+| 이름 | 값 | 용도 |
+| primary-500 | #3366ff | 기본 액션 |
+| ... | ... | ... |
+
+### 타이포그래피
+| 스케일 | Size / Line-height / Weight | 용도 |
+| h1 | 32 / 40 / 700 | 페이지 제목 |
+| ... | ... | ... |
+
+### 간격
+| 이름 | 값 | 용도 |
+| spacing-2 | 8px | 컴포넌트 내부 |
+| ... | ... | ... |
+
+### 라운드 · 그림자
+(표)
+
+## 컴포넌트 인벤토리
+
+| 컴포넌트 | 용도 | Variants | State | 접근성 |
+| Button | ... | primary/secondary/ghost | default/hover/active/disabled/loading | aria-busy in loading |
+| ... | ... | ... | ... | ... |
+
+## 접근성 (WCAG 2.2 AA 체크리스트)
+- [ ] 색 대비 ≥ 4.5:1 (본문) / ≥ 3:1 (large)
+- [ ] 모든 인터랙션 요소 키보드 접근 가능
+- [ ] 포커스 표시 시각적으로 명확
+- [ ] form 에 label + aria-describedby (에러)
+- [ ] 동적 컨텐츠에 aria-live 적절
+
+## 오픈 이슈
+- [ ] ...
+
+## 회의 로그
+```
+
+트랙 종료 시 `✓ UI 저장: docs/design/$NAME/ui.md → 다음 트랙: ...` 1줄 출력.
 
 ### 5-C. Mockup 트랙 (TRACK_MOCKUP=1 일 때)
 
