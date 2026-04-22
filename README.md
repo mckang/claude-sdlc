@@ -72,6 +72,7 @@ claude --plugin-dir /path/to/sdlc-plugin
 | `/sdlc:plan` | Epic→Story→Task 분해 | 기능 시작 시 |
 | `/sdlc:story` | Story 킥오프/검증/완료 | Story마다 3회 |
 | `/sdlc:auto-story` | `/sdlc:story` 의 start·verify·complete·로컬 머지를 자동 실행 (wrapper) | Story마다 0~1회 |
+| `/sdlc:auto-epic` | Epic 의 Story 들을 의존성 레벨별 병렬 실행 + 순차 fan-in (worktree 기반) | Epic마다 0~1회 |
 | `/sdlc:pr` | PR 본문·커밋 메시지 생성 | Story마다 1회 |
 | `/sdlc:meeting` | 범용 팀 토론 (feature/prd/architecture 외 토픽) | 주 1-2회 |
 | `/sdlc:standup` | 일일 스탠드업 리포트 | 매일 |
