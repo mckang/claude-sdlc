@@ -1,6 +1,6 @@
 # sdlc — Claude Code SDLC Plugin
 
-14 개 슬래시 커맨드와 21 명의 팀 페르소나로 아이디어→릴리스→회고 전체 생명주기를 지원하는 Claude Code 플러그인.
+15 개 슬래시 커맨드와 21 명의 팀 페르소나로 아이디어→릴리스→회고 전체 생명주기를 지원하는 Claude Code 플러그인.
 
 ## 설치
 
@@ -45,6 +45,8 @@ claude --plugin-dir /path/to/sdlc-plugin
 # 3~7) 이름 인자 생략 시 Current Feature 자동 사용
 /sdlc:prd
 /sdlc:architecture
+# 선택: 필요한 트랙만. 생략해도 plan 진행 가능
+/sdlc:design --api --ui --mockup
 /sdlc:plan
 /sdlc:story start E1-S1
 # ... 구현 ...
@@ -58,7 +60,7 @@ claude --plugin-dir /path/to/sdlc-plugin
 산출물 파일명 규약: `docs/<type>/<type>-<name>.md`
 (예: `docs/plans/plan-checkout-v2.md`, `docs/prd/prd-checkout-v2.md`)
 
-## 커맨드 (14 + 1)
+## 커맨드 (15 + 1)
 
 | 커맨드 | 목적 | 빈도 |
 |---|---|---|
@@ -66,6 +68,7 @@ claude --plugin-dir /path/to/sdlc-plugin
 | `/sdlc:feature` | 만들고 싶은 것을 대화로 받아 기능 리스트로 정리 (반~1페이지) | 기능 시작 시 |
 | `/sdlc:prd` | feature → 공식 PRD 생성 | 기능 시작 시 |
 | `/sdlc:architecture` | PRD → 아키텍처 + 표준 링크 | 기능 시작 시 |
+| `/sdlc:design` | API · UI 디자인 시스템 · Mockup 중 선택 트랙 설계 (선택) | 필요 시 |
 | `/sdlc:plan` | Epic→Story→Task 분해 | 기능 시작 시 |
 | `/sdlc:story` | Story 킥오프/검증/완료 | Story마다 3회 |
 | `/sdlc:pr` | PR 본문·커밋 메시지 생성 | Story마다 1회 |
@@ -99,6 +102,7 @@ docs/
 ├── features/               # feature-<name>.md  (/sdlc:feature 결과)
 ├── prd/                    # prd-<name>.md      (/sdlc:prd 결과)
 ├── architecture/           # architecture-<name>.md  (/sdlc:architecture 결과)
+├── design/                 # <name>/{api,ui,mockup,README}.md  (/sdlc:design 결과, 선택)
 ├── plans/                  # Plan 문서
 │   ├── archive/            # 스코프 변경 시 원본 백업
 │   └── scope-changes/      # 변경 상세 리포트
