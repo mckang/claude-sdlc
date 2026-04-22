@@ -145,69 +145,11 @@ Story의 **담당 영역**을 보고 다음을 `Read`로 읽는다:
 
 #### 3-A-4: 킥오프 보고서 출력
 
-다음 형식으로 사용자에게 응답:
+보고서 형식은 `${CLAUDE_PLUGIN_ROOT}/templates/reports/story/kickoff.md` 에 정의돼 있다. 해당 파일을 `Read` 해서 템플릿으로 삼고, `<...>` 플레이스홀더를 3-A-1 ~ 3-A-3 에서 수집한 내용으로 채워 사용자에게 출력한다.
 
-```markdown
-# 🚀 E1-S1 킥오프: 토큰 테이블 마이그레이션
-
-## 목표
-(Story 설명 1-2줄)
-
-## 수용 기준
-- AC-1: ...
-- AC-2: ...
-
-## Task 목록
-1. E1-S1-T1: users 테이블 컬럼 추가 (dba, S)
-2. E1-S1-T2: email_verification_tokens 테이블 생성 (dba, S)
-3. E1-S1-T3: 온라인 마이그레이션 POC (dba, M)
-4. E1-S1-T4: 스테이징 적용 (dba, S)
-
-## 접근 방법
-
-### 예상 변경 파일
-**신규 생성:**
-- `src/main/resources/db/migration/V020__add_users_email_verified_at.sql`
-- `src/main/resources/db/migration/V021__create_email_verification_tokens.sql`
-
-**수정:**
-- 없음 (스키마만)
-
-### 신규 의존성
-없음
-
-### 참조 표준
-- `${CLAUDE_PROJECT_DIR}/docs/standards/database/naming.md` — 테이블·컬럼 명명 규칙
-- `${CLAUDE_PROJECT_DIR}/docs/standards/database/schema-design.md` — FK·인덱스 정책
-- `${CLAUDE_PROJECT_DIR}/docs/standards/database/migrations.md` — 온라인 마이그레이션 패턴
-
-### 관련 기존 코드
-- `src/main/resources/db/migration/V019__*.sql` (가장 최근 마이그레이션 참고)
-- `src/main/java/com/example/auth/` (인증 도메인 코드)
-
-### 구현 순서 제안
-1. 먼저 `users.email_verified_at` 컬럼 추가 (NULL 허용, 기존 호환)
-2. `email_verification_tokens` 테이블 생성 + 인덱스
-3. 온라인 마이그레이션 가능성 점검 (락 시간, 백필 필요성)
-4. 스테이징 적용 및 롤백 테스트
-
-## ⚠️ 확인 필요 사항
-
-다음은 설계 문서나 PRD에서 명확하지 않아 확인이 필요합니다:
-
-1. **기존 사용자의 `email_verified_at` 초기값**: NULL(미인증) vs `created_at` 복사(기존 사용자는 인증 면제)
-   - PRD 8절에 "미결" 사항으로 있음
-   - 이 결정 없이 진행 불가
-   
-2. **토큰 TTL**: 기본 24시간인데, 환경변수로 설정 가능하게 할지 하드코딩할지
-
-## 다음 액션
-
-선택하세요:
-- (a) 위 접근으로 진행 — "구현 시작"이라고 답해주세요
-- (b) 접근 방법 조정 필요
-- (c) 확인 필요 사항부터 해결 (예: /meeting 호출)
-```
+핵심 준수 사항:
+- "⚠️ 확인 필요 사항" 섹션이 있을 때는 반드시 리스트로 명시 (없으면 섹션 자체를 "없음" 한 줄로 유지).
+- "다음 액션" 의 (a)/(b)/(c) 3 옵션 문구는 템플릿 그대로 유지 — 후속 흐름이 이 문구를 기대.
 
 #### 3-A-5: Story 브랜치 생성 + 킥오프 기록 (사용자 "구현 시작" 승인 직후)
 
@@ -391,32 +333,14 @@ Grep으로 탐지 후 보고.
 
 #### 3-B-5: 검증 요약 보고
 
-```markdown
-# ✓ E1-S1 검증 결과
+보고서 형식은 `${CLAUDE_PLUGIN_ROOT}/templates/reports/story/verify.md` 에 정의돼 있다. `Read` 해서 템플릿으로 쓰고, 3-B-1 ~ 3-B-4 결과로 채워 사용자에게 출력한다.
 
-## 최종 판정: 🟡 CONDITIONAL PASS
+판정 고정 규칙:
+- ✅ PASS: 모든 AC 확인 + DoD 완전 충족 + 표준 위반 0 건.
+- 🟡 CONDITIONAL PASS: 핵심 AC 는 통과했지만 일부 DoD 미완 또는 경미한 표준 경고.
+- ❌ FAIL: AC 중 하나 이상 불통 또는 표준 위반 🔴 심각.
 
-### 통과
-- 모든 단위 테스트 통과
-- AC-1, AC-3 확인
-- 코드 스타일 준수
-
-### 미완
-- ❌ AC-2 테스트 없음 — 작성 필요
-- ❌ 통합 테스트 1건 실패 (Testcontainers)
-- ❌ DoD: 스테이징 배포 대기
-- 🟡 DoD: 성능 NFR 미측정
-
-### 표준 체크 위반: 없음
-
-## 제안 액션
-
-1. AC-2 테스트 추가 (`UserServiceTest#shouldRejectInvalidPassword`)
-2. Testcontainers 실패 원인 분석
-3. 스테이징 배포는 M1 마일스톤 시점에
-
-`complete` 전에 위 항목들 해결하는 것을 권장합니다.
-```
+다음 하위 단계(3-B-6) 의 `verify.md` 저장 시 이 판정 라인을 프런트매터 아래 본문 최상단에 유지한다 — 후속 `complete` 단계가 이를 읽어 강제 진행 여부를 판단한다.
 
 #### 3-B-6: verify.md 저장 (조용한 덮어쓰기)
 
@@ -487,55 +411,11 @@ Plan 파일에서 해당 Story의:
 
 #### 3-C-4: 완료 보고
 
-```markdown
-# ✅ E1-S1 완료
+보고서 형식은 `${CLAUDE_PLUGIN_ROOT}/templates/reports/story/complete.md` 에 정의돼 있다. `Read` 해서 템플릿으로 쓰고, 3-C-1 ~ 3-C-3 결과와 구현 중 수집한 변경 내역·커밋 후보 메시지로 채워 사용자에게 출력한다.
 
-## 요약
-- Story: 토큰 테이블 마이그레이션
-- 크기: M
-- 소요: 예상 대비 +20% (S가 M으로 재추정됨)
-
-## 변경된 파일
-**신규 (3개)**:
-- src/main/resources/db/migration/V020__add_users_email_verified_at.sql
-- src/main/resources/db/migration/V021__create_email_verification_tokens.sql
-- src/test/java/.../MigrationIntegrationTest.java
-
-**수정 (1개)**:
-- ${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-checkout-v2.md (4장 "데이터 모델"에 실제 컬럼명 반영)
-
-## 신규 의존성
-없음
-
-## 설계 대비 차이
-- 원래 `token` 컬럼이었으나 보안상 `token_hash`로 변경
-- 아키텍처 문서 반영 완료
-
-## 알려진 이슈·후속
-- AC-2의 네거티브 테스트는 다음 Story(E1-S2)에서 통합 커버
-- 성능 NFR 측정은 E1-S3 완료 후 일괄
-
-## 커밋 제안
-
-```
-feat(auth): E1-S1 인증 토큰 DB 스키마
-
-- users.email_verified_at 컬럼 추가
-- email_verification_tokens 테이블 생성 (token_hash 저장)
-- 인덱스: 사용자별·만료 기반 부분 인덱스
-- 마이그레이션 온라인 적용 가능 확인
-
-Refs: ${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.md#E1-S1
-```
-
-## 다음 Story 제안
-
-의존성 그래프(plan-<name>.deps.md) 기준 다음 후보:
-- **E1-S2: 토큰 생성·검증 서비스** (E1-S1 블로킹 해제됨, 담당: backend)
-- **E1-S3: 인증 완료 이벤트 발행** (병렬 가능, 담당: backend)
-
-`/sdlc:story start E1-S2` 로 시작하세요 (current feature 사용).
-```
+핵심 준수 사항:
+- **커밋 제안** 섹션의 `Refs: <Plan 경로>#<STORY_ID>` 라인은 템플릿 그대로 유지 (자동 crossref 추적에 사용).
+- **다음 Story 제안** 은 `plan-<name>.deps.md` 를 `Read` 해서 이 Story 완료로 unblock 되는 후보만 나열.
 
 #### 3-C-5: complete.md 저장 (덮어쓰기 확인)
 

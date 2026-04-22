@@ -235,140 +235,26 @@ E1-S1-T4: 통합 테스트 작성 (qa, S)
 
 ### 6.1 메인 계획 문서 (`$OUT`)
 
-> **참조 Design 라인 규칙**: design 디렉터리가 없거나 트랙 파일이 하나도 없으면 (즉 `DESIGN_TRACKS` 가 빈 문자열이면) **`참조 Design` 라인 전체를 출력하지 말 것** — 빈 괄호·빈 트랙 문자열 금지.
+Plan 문서 형식은 `${CLAUDE_PLUGIN_ROOT}/templates/reports/plan/plan.md` 에 정의돼 있다. 해당 파일을 `Read` 해서 템플릿으로 쓰고, 1~5 단계에서 수집·회의한 내용으로 `<...>` 플레이스홀더를 채워 `$OUT` 에 쓴다.
 
-```markdown
-# 실행 계획: {제목}
-
-- **작성일**: YYYY-MM-DD
-- **참조 PRD**: {$PRD}
-- **참조 아키텍처**: {$ARCH}
-- **참조 Design**: docs/design/{NAME}/ (트랙: {$DESIGN_TRACKS})
-- **기술 스택**: {감지된 스택}
-- **상태**: draft | approved | in_progress | done
-
-## 요약
-- Epic: N개
-- Story: M개
-- Task: K개
-- 예상 기간: N주 (버퍼 포함)
-- 마일스톤: M개
-
-## 마일스톤
-| ID | 이름 | 목표일 (주차) | 기준 |
-|----|------|---------------|------|
-| M1 | ... | 주 2 | 스테이징 배포 |
-| M2 | ... | 주 5 | 베타 오픈 |
-| ... |
-
-## Epic·Story·Task 분해
-
-### E1: {Epic 이름}
-**목표**: {한 문장 요약}
-**예상 크기**: S/M/L/XL 합산
-**마일스톤**: M1
-
-#### E1-S1: {Story 제목}
-- **담당 영역**: backend, dba
-- **크기**: M
-- **설명**: ...
-- **수용 기준**:
-  - AC-1: Given ~ When ~ Then ~
-  - AC-2: ...
-- **DoD**:
-  - [ ] 단위 테스트 통과
-  - [ ] 코드 리뷰 통과
-  - [ ] 스테이징 배포 확인
-  - [ ] (Story별 추가 기준)
-
-**Task**:
-| ID | 제목 | 담당 | 크기 |
-|----|------|------|------|
-| E1-S1-T1 | users 테이블 마이그레이션 | dba | S |
-| E1-S1-T2 | POST /api/v1/auth/signup | backend | M |
-| ... |
-
-#### E1-S2: ...
-
-### E2: ...
-
-## 크리티컬 패스
-(텍스트 설명, 의존성 다이어그램은 별도 파일 참조)
-
-E1-S1 (DB) → E1-S3 (Auth API) → E1-S5 (Login UI) → E2-S1 (상품 조회) → ...
-
-## 리스크 및 완화
-
-| ID | 등급 | 내용 | 완화 전략 | 담당 |
-|----|------|------|-----------|------|
-| R1 | 🔴 | OAuth 제공자 정책 변경 | 두 번째 제공자 Fallback 설계 | security |
-| R2 | 🟡 | 기존 DB 마이그레이션 락 | 온라인 마이그레이션 POC 선행 | dba |
-| ... |
-
-## 가정 및 미결 사항
-- ...
-
-## 반대 의견 보존
-(회의 중 채택되지 않은 의견 — 나중 재검토용)
-
-## 회의 로그
-(전체 회의 대화 발언 순서·헤더 보존하며 append)
-```
+핵심 준수 사항:
+- **참조 Design 라인 규칙**: design 디렉터리가 없거나 `DESIGN_TRACKS` 가 빈 문자열이면 `- **참조 Design**: ...` **라인 전체를 삭제** — 빈 괄호·빈 트랙 문자열 금지.
+- Story 헤더 포맷 `#### E<i>-S<j>:` 는 그대로 유지 (후속 `/sdlc:story`, `/sdlc:auto-epic` 이 이 패턴으로 Story 를 추출).
+- 각 Story 의 `- **수용 기준**:`, `- **DoD**:`, `**Task**:` 섹션 키는 정확히 유지 — story 커맨드의 2 단계 파싱이 이에 의존.
+- Task 테이블 컬럼은 `ID | 제목 | 담당 | 크기` 순서 고정.
 
 ### 6.2 의존성 다이어그램 파일 (`$OUT` 의 `.md` 앞에 `.deps` 삽입)
 
-산출물 경로 `$OUT` 이 `${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.md`라면, 의존성 파일은 `${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.deps.md`:
+산출물 경로 `$OUT` 이 `${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.md`라면, 의존성 파일은 `${CLAUDE_PROJECT_DIR}/docs/plans/plan-checkout-v2.deps.md`.
 
-```markdown
-# 의존성 그래프: {제목}
+포맷은 `${CLAUDE_PLUGIN_ROOT}/templates/reports/plan/deps.md` 에 정의돼 있다. `Read` 해서 템플릿으로 쓰고, 4 단계 Round 4 에서 도출한 의존성·크리티컬 패스·트랙·외부 의존성 정보로 채운다.
 
-메인 계획: [{$OUT 파일명}]({$OUT 상대경로})
-
-## Story 간 의존성
-
-\`\`\`mermaid
-graph LR
-  E1S1[E1-S1: DB 스키마] --> E1S2[E1-S2: 사용자 API]
-  E1S1 --> E1S3[E1-S3: 인증 API]
-  E1S2 --> E1S4[E1-S4: 프로필 UI]
-  E1S3 --> E1S5[E1-S5: 로그인 UI]
-  E1S5 --> E2S1[E2-S1: 대시보드]
-  E1S4 --> E2S1
-  
-  classDef critical fill:#fee,stroke:#c00,stroke-width:3px
-  classDef done fill:#efe,stroke:#0a0
-  class E1S1,E1S3,E1S5,E2S1 critical
-\`\`\`
-
-### 범례
-- 🔴 빨간 테두리: 크리티컬 패스 (지연 허용 없음)
-- 실선 화살표: 하드 블로킹 (A 없이 B 불가)
-- 점선 화살표: 소프트 의존 (Mock 등으로 우회 가능)
-
-## 병렬화 트랙
-
-트랙 A (Backend/DB): E1-S1 → E1-S3 → E2-S2 → ...
-트랙 B (Frontend): E1-S4 → E1-S5 → E2-S1 → ...
-트랙 C (QA/통합): 각 Story 완료 후 즉시
-
-## 마일스톤별 완료 Story
-
-- **M1 (주 2)**: E1-S1, E1-S2, E1-S3
-- **M2 (주 5)**: E1-S4, E1-S5, E2-S1, E2-S2
-- **M3 (주 8)**: E2-S3, E3-S1, E3-S2
-- **M4 (주 11)**: 잔여 전부 + 버퍼
-
-## 외부 의존성
-
-프로젝트 외부의 의존 (3rd party API, 인프라 준비, 법무 검토 등):
-
-\`\`\`mermaid
-graph TD
-  LEGAL[법무 검토: PG사 계약] --> E3S1
-  INFRA[프로덕션 DB 증설] --> E1S1
-  DESIGN[UX 디자인 시안] --> E1S5
-\`\`\`
-```
+핵심 준수 사항:
+- mermaid 엣지 구문은 정확히 유지 — `/sdlc:auto-epic` 의 deps 파서 ([commands/auto-epic.md:90-94](commands/auto-epic.md#L90-L94)) 가 이 패턴을 정규식으로 매칭.
+  - 하드 의존: `E1S1 --> E1S2`
+  - 소프트 의존: `E1S1 -.-> E1S2`
+- Story 노드 ID 는 하이픈 없이 붙여쓴다 (`E1S1`). Story ID 자체는 `E1-S1` 이지만 mermaid 안에서는 `[E1-S1: 제목]` 라벨로 표기.
+- `classDef critical` 과 `class ... critical` 문법은 유지 — 크리티컬 패스 Story 만 `class` 에 등재.
 
 ## 7단계: 최종 보고
 

@@ -179,6 +179,7 @@ docs/
 
 ## 버전
 
+- **v1.5.5** — 보고서 템플릿 외부화: `story.md` 의 kickoff/verify/complete 3 템플릿과 `plan.md` 의 Plan·deps 2 템플릿을 `${CLAUDE_PLUGIN_ROOT}/templates/reports/{story,plan}/*.md` 로 분리. 커맨드 파일은 "이 템플릿을 Read 해서 쓰라" + "핵심 준수 사항" 만 짧게 기술. story.md 652 → 528 줄 (-124), plan.md 413 → 296 줄 (-117). 동작 변화 없음.
 - **v1.5.4** — 21 명 페르소나에 `tier: essential | specialized` frontmatter 추가 (essential 8, specialized 13). `/sdlc:roles` 는 두 tier 를 분리해 출력, README 도 두 표로 재편. 파일 이동 없음 — 자동 참석자 선정 로직은 essential 기본 + 주제 매칭 시 specialized 합류.
 - **v1.5.3** — `/sdlc:init` 표준 문서 설치가 **on-demand** 로 전환. 이전에는 25 개 표준을 일괄 복사했으나, 이제 사용자가 쓰는 스택(springboot · nextjs · fastapi · frontend · database)만 선택 설치. 나중에 스택이 늘면 `/sdlc:init` 재실행으로 추가(`cp -Rn` — 기존 파일 보존). 기본값(빈 답변)은 `all` 로 이전 동작과 호환.
 - **v1.5.2** — README 커맨드 표를 **Core (7) / Extension (11)** 구조로 재편. 설계 보강·자동화·보고·운영·범용 소분류 추가. `plugin.json` · `marketplace.json` description 에도 Core/Extension 표기 반영. 커맨드·페르소나 추가 없음 (문서만).
