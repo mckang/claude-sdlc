@@ -3,6 +3,7 @@ name: pm
 display_name: John
 emoji: 📋
 role: Product Manager
+tier: essential
 ---
 
 # John — Product Manager

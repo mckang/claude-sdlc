@@ -3,6 +3,7 @@ name: legal
 display_name: Chloe
 emoji: ⚖️
 role: Legal/Compliance
+tier: specialized
 ---
 
 # Chloe — Legal & Compliance

@@ -111,14 +111,26 @@ claude --plugin-dir /path/to/sdlc-plugin
 
 ## 페르소나 (21)
 
+각 페르소나는 frontmatter 의 `tier: essential | specialized` 로 분류된다. 자동 참석자 선정 로직은 essential 을 기본 고려하고, 주제에 따라 specialized 를 합류시킨다. `/sdlc:roles` 는 두 tier 를 분리해 보여준다.
+
+### ⭐ Essential (8) — 거의 모든 미팅의 단골 참석자
+
 | 분류 | 페르소나 |
 |---|---|
 | 진행 | 🎩 facilitator · 🧭 scrum-master · 🗓️ planner |
-| 기획 | 🔍 analyst · 📋 pm · 🎭 ux |
-| 설계 | 🏛️ architect · 🧑‍🏫 techlead |
-| 구현 | ⚙️ backend · 🎨 frontend · 📱 mobile |
+| 기획·설계 | 📋 pm · 🏛️ architect |
+| 구현 | ⚙️ backend · 🎨 frontend |
+| 품질 | 🧪 qa |
+
+### 🧩 Specialized (13) — 주제가 닿을 때만 호출
+
+| 분류 | 페르소나 |
+|---|---|
+| 기획 | 🔍 analyst · 🎭 ux |
+| 설계 | 🧑‍🏫 techlead |
+| 구현 | 📱 mobile |
 | 데이터·인프라 | 🗄️ dba · ☁️ cloud · 📊 data · 🤖 ml |
-| 운영·품질 | 🔭 sre · 🧪 qa |
+| 운영 | 🔭 sre |
 | 지원 | 🛡️ security · 📝 writer · ⚖️ legal · 💰 finops |
 
 ## 설치되는 문서 구조
@@ -167,6 +179,7 @@ docs/
 
 ## 버전
 
+- **v1.5.4** — 21 명 페르소나에 `tier: essential | specialized` frontmatter 추가 (essential 8, specialized 13). `/sdlc:roles` 는 두 tier 를 분리해 출력, README 도 두 표로 재편. 파일 이동 없음 — 자동 참석자 선정 로직은 essential 기본 + 주제 매칭 시 specialized 합류.
 - **v1.5.3** — `/sdlc:init` 표준 문서 설치가 **on-demand** 로 전환. 이전에는 25 개 표준을 일괄 복사했으나, 이제 사용자가 쓰는 스택(springboot · nextjs · fastapi · frontend · database)만 선택 설치. 나중에 스택이 늘면 `/sdlc:init` 재실행으로 추가(`cp -Rn` — 기존 파일 보존). 기본값(빈 답변)은 `all` 로 이전 동작과 호환.
 - **v1.5.2** — README 커맨드 표를 **Core (7) / Extension (11)** 구조로 재편. 설계 보강·자동화·보고·운영·범용 소분류 추가. `plugin.json` · `marketplace.json` description 에도 Core/Extension 표기 반영. 커맨드·페르소나 추가 없음 (문서만).
 - **v1.5.1** — 11 개 커맨드에 중복되던 `## Current Feature` 파싱 `awk` 블록을 `scripts/resolve-current-feature.sh` 로 분리. 동작 변화 없음 (패턴·출력 동일). 커맨드 총 줄수 -40.

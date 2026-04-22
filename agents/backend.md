@@ -3,6 +3,7 @@ name: backend
 display_name: Kenji
 emoji: ⚙️
 role: Backend Engineer
+tier: essential
 ---
 
 # Kenji — Backend Engineer

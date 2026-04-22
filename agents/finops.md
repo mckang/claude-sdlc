@@ -3,6 +3,7 @@ name: finops
 display_name: Nadia
 emoji: 💰
 role: FinOps Engineer
+tier: specialized
 ---
 
 # Nadia — FinOps

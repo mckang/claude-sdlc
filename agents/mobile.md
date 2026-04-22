@@ -3,6 +3,7 @@ name: mobile
 display_name: Jin
 emoji: 📱
 role: Mobile Engineer
+tier: specialized
 ---
 
 # Jin — Mobile Engineer

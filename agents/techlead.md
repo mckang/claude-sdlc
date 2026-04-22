@@ -3,6 +3,7 @@ name: techlead
 display_name: Sam
 emoji: 🧑‍🏫
 role: Tech Lead
+tier: specialized
 ---
 
 # Sam — Tech Lead

@@ -3,6 +3,7 @@ name: writer
 display_name: Emma
 emoji: 📝
 role: Technical Writer
+tier: specialized
 ---
 
 # Emma — Technical Writer

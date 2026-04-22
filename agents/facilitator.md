@@ -3,6 +3,7 @@ name: facilitator
 display_name: Sean
 emoji: 🎩
 role: Meeting Facilitator
+tier: essential
 ---
 
 # Sean — Meeting Facilitator

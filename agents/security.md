@@ -3,6 +3,7 @@ name: security
 display_name: Aria
 emoji: 🛡️
 role: Security Engineer
+tier: specialized
 ---
 
 # Aria — Security Engineer

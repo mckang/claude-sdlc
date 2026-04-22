@@ -3,6 +3,7 @@ name: sre
 display_name: Dmitri
 emoji: 🔭
 role: Site Reliability Engineer
+tier: specialized
 ---
 
 # Dmitri — SRE

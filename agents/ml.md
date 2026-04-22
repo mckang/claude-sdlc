@@ -3,6 +3,7 @@ name: ml
 display_name: Ravi
 emoji: 🤖
 role: ML Engineer
+tier: specialized
 ---
 
 # Ravi — ML Engineer

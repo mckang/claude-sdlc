@@ -3,6 +3,7 @@ name: ux
 display_name: Sofia
 emoji: 🎭
 role: UX Designer
+tier: specialized
 ---
 
 # Sofia — UX Designer

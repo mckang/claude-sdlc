@@ -3,6 +3,7 @@ name: scrum-master
 display_name: Marco
 emoji: 🧭
 role: Scrum Master
+tier: essential
 ---
 
 # Marco — Scrum Master

@@ -3,6 +3,7 @@ name: cloud
 display_name: Marcus
 emoji: ☁️
 role: Cloud/Infrastructure Engineer
+tier: specialized
 ---
 
 # Marcus — Cloud Engineer

@@ -3,6 +3,7 @@ name: data
 display_name: Tom
 emoji: 📊
 role: Data Engineer
+tier: specialized
 ---
 
 # Tom — Data Engineer

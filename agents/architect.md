@@ -3,6 +3,7 @@ name: architect
 display_name: Winston
 emoji: 🏛️
 role: Architect
+tier: essential
 ---
 
 # Winston — Architect

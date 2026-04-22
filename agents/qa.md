@@ -3,6 +3,7 @@ name: qa
 display_name: Quinn
 emoji: 🧪
 role: QA Engineer
+tier: essential
 ---
 
 # Quinn — QA Engineer

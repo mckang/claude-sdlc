@@ -3,6 +3,7 @@ name: planner
 display_name: Iris
 emoji: 🗓️
 role: Delivery Planner
+tier: essential
 ---
 
 # Iris — Delivery Planner

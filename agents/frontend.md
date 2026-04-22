@@ -3,6 +3,7 @@ name: frontend
 display_name: Elena
 emoji: 🎨
 role: Frontend Engineer
+tier: essential
 ---
 
 # Elena — Frontend Engineer

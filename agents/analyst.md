@@ -3,6 +3,7 @@ name: analyst
 display_name: Mary
 emoji: 🔍
 role: Business/Product Analyst
+tier: specialized
 ---
 
 # Mary — Business Analyst

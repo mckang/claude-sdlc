@@ -3,6 +3,7 @@ name: dba
 display_name: Priya
 emoji: 🗄️
 role: Database Administrator
+tier: specialized
 ---
 
 # Priya — DBA
