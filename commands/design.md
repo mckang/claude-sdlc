@@ -276,6 +276,7 @@ mkdir -p "$DESIGN_DIR"
 **Round 1 — 디자인 원칙 (ux 주도)**
 - 이 feature 의 UI 가 지향하는 원칙 2-4 줄 (예: "밀도 높지만 실수 방지", "1차 액션만 강조")
 - 페르소나 분석 결과와 정합성 확인
+- 이후 라운드에서 토큰·컴포넌트가 원칙과 어긋나면 오픈 이슈에 기록.
 
 **Round 2 — 토큰 정의 (ux + frontend)**
 - 색: primary / secondary / semantic(success·warning·danger·info) / neutral 스케일
@@ -291,6 +292,7 @@ mkdir -p "$DESIGN_DIR"
 - 재사용 vs 신규 생성 판단 (architect 교차)
 
 **Round 4 — 접근성 체크리스트 (architect 주도)**
+- Round 3 은 컴포넌트별 가이드, Round 4 는 feature 전체 기준 — 중복 금지.
 - WCAG 2.2 AA 기준 핵심 항목만:
   - 색 대비 ≥ 4.5:1 (body) / 3:1 (large)
   - 키보드 전용 내비게이션 가능
@@ -320,16 +322,22 @@ mkdir -p "$DESIGN_DIR"
 
 ### 색
 | 이름 | 값 | 용도 |
+|------|-----|------|
 | primary-500 | #3366ff | 기본 액션 |
 | ... | ... | ... |
 
 ### 타이포그래피
+
+- **Font family**: base / heading / mono — ...
+
 | 스케일 | Size / Line-height / Weight | 용도 |
+|-------|-----------------------------|------|
 | h1 | 32 / 40 / 700 | 페이지 제목 |
 | ... | ... | ... |
 
 ### 간격
 | 이름 | 값 | 용도 |
+|------|-----|------|
 | spacing-2 | 8px | 컴포넌트 내부 |
 | ... | ... | ... |
 
@@ -339,6 +347,7 @@ mkdir -p "$DESIGN_DIR"
 ## 컴포넌트 인벤토리
 
 | 컴포넌트 | 용도 | Variants | State | 접근성 |
+|---------|------|----------|-------|--------|
 | Button | ... | primary/secondary/ghost | default/hover/active/disabled/loading | aria-busy in loading |
 | ... | ... | ... | ... | ... |
 
@@ -353,6 +362,7 @@ mkdir -p "$DESIGN_DIR"
 - [ ] ...
 
 ## 회의 로그
+(전체 회의 발언 헤더·순서 보존해 append)
 ```
 
 트랙 종료 시 `✓ UI 저장: docs/design/$NAME/ui.md → 다음 트랙: ...` 1줄 출력.
