@@ -13,7 +13,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob
 다음 명령으로 `docs/` 트리를 생성한다 (이미 있는 디렉토리는 건너뜀).
 
 ```bash
-mkdir -p "${CLAUDE_PROJECT_DIR}/docs"/{features,prd,architecture,plans,plans/archive,plans/scope-changes,meetings,retrospectives,standups,pr-drafts,onboarding,guides,standards}
+mkdir -p "${CLAUDE_PROJECT_DIR}/docs"/{features,prd,architecture,plans,plans/archive,plans/scope-changes,meetings,retrospectives,standups,pr-drafts,onboarding,guides,standards,releases}
 ```
 
 ## 2단계: 표준 문서 설치 (스택 선택)
@@ -189,6 +189,7 @@ done
 - `/sdlc:standup` — 일일 스탠드업
 - `/sdlc:status` — 진행 상황 집계
 - `/sdlc:pr` — PR 본문 생성
+- `/sdlc:release` — Phase-Gate 릴리스 (Pre-release → Go/No-go → 배포 안내)
 - `/sdlc:scope-change` — 스코프 변경 기록
 - `/sdlc:plan-review` — Plan 리뷰
 - `/sdlc:retrospective` — 회고
