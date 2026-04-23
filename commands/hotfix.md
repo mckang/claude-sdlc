@@ -135,4 +135,48 @@ git checkout -b hotfix/<DESCRIPTION>
    → 해당 항목 완료 후 /sdlc:hotfix 를 다시 실행하세요.
 ```
 
+### 4단계: Phase 3 — 배포 & 문서화 (기본 모드)
+
+> 목적: 버전 태그 안내 후 문서를 생성하고 current feature를 원복한다.
+> 이 단계는 한 번 진입하면 중단 없이 끝까지 완료한다.
+
+#### Git 태그 안내
+
+`DRY_RUN=true` 이면 Bash 실행 없이 `VERSION="v0.0.0-dry-run"` 으로 설정한다.
+
+`DRY_RUN=false` 이면 다음 명령어를 실행하여 최신 태그를 확인한다 (이 명령은 조회 전용이므로 Bash로 실행한다):
+
+```bash
+git tag --sort=-v:refname | head -1
+```
+
+**버전 결정 규칙:**
+- 태그가 없으면 → `v0.1.0` 제안
+- 태그가 있으면 → patch 버전을 1 올린다 (예: `v1.2.3` → `v1.2.4`)
+
+결정된 버전을 `$VERSION` 변수에 저장한다.
+
+아래 명령어는 사용자가 직접 실행한다 — Claude는 실행하지 않는다:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 배포 안내 (기본 모드)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+제안 버전: v<X.Y.Z>
+
+아래 명령어를 직접 실행하세요:
+
+# 1. Git 태그
+git tag v<X.Y.Z> && git push origin v<X.Y.Z>
+
+# 2. 배포
+#    CI/CD 파이프라인이 태그 push로 자동 트리거되는 경우: 위로 완료
+#    수동 배포가 필요한 경우: docs/guides/development-workflow.md 참조
+```
+
+(`v<X.Y.Z>` 자리에 실제 `$VERSION` 값을 출력한다.)
+
+문서 산출물 저장과 current feature 원복은 **6단계(공통)** 에서 처리한다.
+
 **dry-run 모드:** 사용자 응답 없이 5개 항목 모두 `[ ]` 상태로 `STD_CHECKLIST_RESULT="[dry-run]"` 기록 후 계속 진행.
