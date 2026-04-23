@@ -265,7 +265,23 @@ Phase 3로 계속 진행한다.
 
 ### 1. Git 태그 안내
 
-다음 명령어를 실행하여 최신 태그를 확인한다:
+**DRY_RUN=true 이면:**
+
+Bash 명령을 실행하지 않고 `VERSION="v0.0.0-dry-run"` 으로 설정한 뒤, 아래 플레이스홀더 배포 블록을 출력하고 다음 단계로 넘어간다.
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Phase 3: 배포 안내 (dry-run)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+제안 버전: v0.0.0-dry-run
+
+(dry-run: 실제 태그 명령어 미실행)
+```
+
+**DRY_RUN=true 이 아니면:**
+
+이 명령(`git tag --sort=...`)은 조회 전용이므로 Bash로 실행한다.
 
 ```bash
 git tag --sort=-v:refname | head -1
@@ -277,7 +293,7 @@ git tag --sort=-v:refname | head -1
 
 결정된 버전을 `$VERSION` 변수에 저장한다.
 
-다음 내용을 출력한다 (Claude는 직접 실행하지 않고 사용자에게 안내만 한다):
+아래 명령어는 사용자가 직접 실행한다 — Claude는 실행하지 않는다.
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -345,7 +361,7 @@ git tag v<X.Y.Z> && git push origin v<X.Y.Z>
 
 ### 3. 롤백 기준 및 명령어 문서화
 
-다음 내용을 출력한다:
+아래는 롤백 시 사용자가 직접 실행할 명령어이며 Claude는 실행하지 않는다.
 
 ```markdown
 ## 롤백 기준
@@ -359,6 +375,12 @@ git tag v<X.Y.Z> && git push origin v<X.Y.Z>
 git revert <merge-commit-hash>
 # 또는 이전 태그 재배포: git push origin v<이전 버전>:refs/tags/v<이전 버전>
 ```
+
+**DRY_RUN=true 이면:**
+
+사용자에게 해시를 묻지 않는다. `<merge-commit-hash>` 플레이스홀더를 그대로 유지하여 `$ROLLBACK_SECTION` 변수에 저장하고 다음 단계로 넘어간다.
+
+**DRY_RUN=true 이 아니면:**
 
 이후 사용자에게 머지 커밋 해시를 묻는다:
 
