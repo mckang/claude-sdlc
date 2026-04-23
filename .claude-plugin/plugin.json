@@ -1,6 +1,6 @@
 {
   "name": "sdlc",
-  "version": "1.6.2",
+  "version": "1.7.0",
   "description": "SDLC support: 7 core + 11 extension slash commands and 13 team personas (feature to release to retrospective)",
   "author": {
     "name": "Thomas Kang",

@@ -22,8 +22,17 @@ npm run dev         # http://localhost:3000
 ```bash
 npm run build       # 프로덕션 빌드
 npm run typecheck   # TypeScript strict 검증
+npm run test        # vitest 단위 테스트 (lib/ 대상, 16 건)
+npm run test:watch  # watch 모드
 npm run lint
 ```
+
+### 테스트 커버리지 (v1.7.0 에서 추가)
+
+이 예제의 초기 버전(v1.6.2)은 "테스트 없음" 으로 출시됐고, 회고에서 Architect(Tony)·QA(Clint) 의 반대 의견이 보존됐습니다([docs/plans/plan-todo-app.md](docs/plans/plan-todo-app.md) 반대 의견 보존 섹션). v1.7.0 에서 A3 액션으로 종결되어 `lib/storage.ts` 와 `lib/use-todos.ts` 에 단위 테스트가 추가됐습니다.
+
+- `lib/storage.test.ts` — 7건: 빈 값 · 정상 JSON · **깨진 JSON fallback** (E1-S3 AC-3 regression guard) · 비배열 값 · malformed 항목 필터 등
+- `lib/use-todos.test.ts` — 9건: 초기 로드 · addTodo 공백/200자 경계 · toggle/delete/clearCompleted · **loadedRef 가 초기 mount 에 localStorage 를 덮어쓰지 않는지** 확인
 
 ## SDLC 산출물 지도
 
@@ -73,7 +82,7 @@ examples/todo-app/
 
 - 서버·동기화 없음 (PRD Out of Scope). 다른 기기·브라우저 간 공유 불가
 - 동시 탭 간 실시간 동기화 없음. 한쪽에서 변경 후 다른 쪽 새로고침하면 반영됨
-- 자동화 테스트 없음 — 예제 경량화를 위해 Plan 단계에서 명시적으로 제외 (반대 의견은 [plan-todo-app.md](docs/plans/plan-todo-app.md) "반대 의견 보존" 섹션에 기록됨)
+- 자동화 테스트 — v1.7.0 에서 `lib/` 단위 테스트 16건 추가됨 (vitest). E2E 는 여전히 out of scope
 
 ## 라이선스
 
