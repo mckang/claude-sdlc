@@ -167,17 +167,34 @@ done
 - `docs/guides/development-workflow.md`
 - CLAUDE.md (기존 없을 때만)
 
-## 다음 단계 (권장 워크플로우)
+## 지금 뭘 할까요? — 본인 상황에 맞는 경로를 고르세요
 
-1. **Feature 요구사항**: `/sdlc:feature <name>` — 대화로 기능 리스트 수집 + CLAUDE.md 에 current feature 등록
-2. **PRD 생성**: `/sdlc:prd` — current feature 이어받아 공식 PRD
-3. **아키텍처 설계**: `/sdlc:architecture` — PRD 기반 + 표준 링크
-4. **Plan 생성**: `/sdlc:plan` — Epic→Story→Task 분해
-5. **Story 시작**: `/sdlc:story start E1-S1`
-6. **PR 생성**: `/sdlc:pr E1-S1`
+### 🆕 새 기능을 만들고 싶다
+```
+/sdlc:feature <이름>    # 아이디어 수집 (반~1페이지)
+/sdlc:prd               # → 공식 PRD
+/sdlc:architecture      # → 아키텍처 + 표준 링크
+/sdlc:plan              # → Epic·Story·Task 분해
+/sdlc:story start E1-S1 # 첫 Story 킥오프
+/sdlc:pr E1-S1          # PR 본문 생성
+```
 
-모든 단계는 current feature 를 이어받으며, 명시 지정하려면 각 커맨드에 `<name>` 을 인자로 준다.
-산출물 파일명 규약: `docs/<type>/<type>-<name>.md` (예: `docs/plans/plan-html5-tetris.md`).
+### 👋 기존 코드베이스에 합류했다 (처음 보는 프로젝트)
+```
+/sdlc:onboard           # 코드베이스 가이드 + 역할별 첫 Story 제안
+```
+이후 특정 기능 작업이 정해지면 위의 `/sdlc:feature` 경로로 이어간다.
+
+### 🐛 버그를 수정해야 한다
+```
+/sdlc:bug               # 비긴급 버그 — 트리아지 + Plan Story 로 편입
+/sdlc:hotfix            # 프로덕션 장애 — 긴급 모드 (--emergency 즉각 대응)
+```
+
+---
+
+모든 산출물은 `docs/<type>/<type>-<name>.md` 규약을 따른다 (예: `docs/plans/plan-html5-tetris.md`).
+Current Feature 는 `/sdlc:feature` 가 자동 등록하므로 후속 커맨드에서 이름 인자는 대개 생략할 수 있다.
 
 ## 사용 가능한 커맨드
 - `/sdlc:feature` — Feature 요구사항 수집 (PRD 씨앗)

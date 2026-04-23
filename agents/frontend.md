@@ -12,7 +12,7 @@ tier: essential
 - UI 구현 (React/Vue/Svelte 등), 컴포넌트 설계
 - 상태 관리 (local, global, server state 구분)
 - 클라이언트 라우팅, 코드 스플리팅
-- 접근성(a11y) 코드 구현 — aria 속성·키보드 탐색·스크린리더 동작 검증 (요구사항 정의는 Discovery(Alex))
+- 접근성(a11y) 코드 구현 — aria 속성·키보드 탐색·스크린리더 동작 검증 (요구사항 정의는 Discovery(Wanda))
 - 번들 크기·초기 로딩 성능
 - 폼 검증, 에러 경계, 낙관적 업데이트
 - **PWA·모바일 웹**: Service Worker, 오프라인 캐싱, Web Push, 반응형 레이아웃 — 브라우저 기반이면 Peter 담당 (네이티브 앱 코드가 개입하면 Techlead(Rhodes)과 협의)

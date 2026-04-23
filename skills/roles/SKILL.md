@@ -22,13 +22,13 @@ description: Use when selecting meeting participants, planning a /sdlc:meeting, 
 
 | 이모지 | 이름 | 키워드 | 역할 | 전문 |
 |--------|------|--------|------|------|
-| 🎩 | Sean | facilitator | Meeting Facilitator | 진행자 (자동 참여) |
+| 🎩 | Nick | facilitator | Meeting Facilitator | 진행자 (자동 참여) |
 
 ## 🧩 Specialized (M) — 주제에 맞을 때만 호출
 
 | 이모지 | 이름 | 키워드 | 역할 | 전문 |
 |--------|------|--------|------|------|
-| 🛡️ | Noor | compliance | Security & Legal | OWASP·위협·개인정보·라이선스 |
+| 🛡️ | Strange | compliance | Security & Legal | OWASP·위협·개인정보·라이선스 |
 
 총 N+M 명의 페르소나가 사용 가능합니다.
 ```
