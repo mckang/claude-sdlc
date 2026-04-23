@@ -79,7 +79,7 @@ Plan 파일이 없으면 `❌ Plan 파일이 없습니다: <경로>` 출력 후 
 | start: 선행 의존성 미완 | deps.md 위반 — 위험 | "그래도 진행?" 확인 |
 | start: 워킹 트리 dirty 또는 main 외 브랜치 | git 상태 비정상 | `/story` 의 분기 처리 그대로 |
 | verify: 🟡 CONDITIONAL PASS / ❌ FAIL | AC 불충족 또는 DoD 미완 | 결과 제시 후 (a) 수정 후 재검증 / (b) 강제 complete / (c) 중단 |
-| complete: 미해결 DoD | `/story` 3-C-1 분기 그대로 | 강제 완료 여부 확인 |
+| complete: 미해결 DoD | `templates/phases/story/complete.md §1` 분기 그대로 | 강제 완료 여부 확인 |
 | complete: `complete.md` 가 이미 존재 | 이전 완료 이력 — 재처리 위험 | `/story` 의 y/N 프롬프트 전달 |
 | 머지: 충돌 | 자동 해결 금지 (`--abort` 도 금지) | 충돌 파일 목록 제시 후 사용자 해결 대기 |
 | 머지: push 필요 여부 | 기본은 push 안 함 | v1 은 `--push` 플래그 미구현, 사용자 수동 |
@@ -91,11 +91,11 @@ Plan 파일이 없으면 `❌ Plan 파일이 없습니다: <경로>` 출력 후 
 
 ### Step 1. start (킥오프)
 
-`commands/story.md` 의 **3-A 절을 그대로 따른다** (3-A-0 ~ 3-A-5).
-다만 3-A-4 킥오프 보고를 출력한 직후 분기:
+[`templates/phases/story/start.md`](../templates/phases/story/start.md) 의 **§1~§6 을 그대로 따른다**.
+다만 §5 킥오프 보고를 출력한 직후 분기:
 
 - `## ⚠️ 확인 필요 사항` 섹션이 **비어있음**:
-  - 1 줄 출력 (`▶ Question 0 건 — 자동 진행`) 후 곧바로 3-A-5 (kickoff.md 덮어쓰기 자동 `y` + 브랜치 생성) 및 구현 진행.
+  - 1 줄 출력 (`▶ Question 0 건 — 자동 진행`) 후 곧바로 §6 (kickoff.md 덮어쓰기 자동 `y` + 브랜치 생성) 및 구현 진행.
 - 1 건 이상:
   - `/story` 와 동일하게 (a)/(b)/(c) 옵션 제시하고 사용자 응답 대기.
   - 사용자 답변 후 구현 진행.
@@ -104,9 +104,9 @@ Plan 파일이 없으면 `❌ Plan 파일이 없습니다: <경로>` 출력 후 
 
 ### Step 2. verify (검증)
 
-구현 완료 후 자동으로 `commands/story.md` **3-B 절** 수행 (테스트 실행 + AC 점검 + DoD 점검 + 표준 체크).
+구현 완료 후 자동으로 [`templates/phases/story/verify.md`](../templates/phases/story/verify.md) **§1~§7** 수행 (테스트 실행 + AC 점검 + DoD 점검 + 표준 체크).
 
-3-B-5 검증 요약 보고를 출력한 직후 분기:
+§6 검증 요약 보고를 출력한 직후 분기:
 
 - **최종 판정 ✅ PASS** → 1 줄 출력 (`▶ verify PASS — complete 진행`) 후 Step 3.
 - **🟡 CONDITIONAL PASS / ❌ FAIL** → 결과 제시 후:
@@ -121,13 +121,13 @@ Plan 파일이 없으면 `❌ Plan 파일이 없습니다: <경로>` 출력 후 
 
 ### Step 3. complete (Plan 갱신)
 
-`commands/story.md` **3-C 절** 수행 (3-C-1 최종 검증 → 3-C-2 Plan 헤더/Task 갱신 → 3-C-3 스냅샷 갱신 → 3-C-4 완료 보고 → 3-C-5 complete.md 저장).
+[`templates/phases/story/complete.md`](../templates/phases/story/complete.md) **§1~§5** 수행 (§1 최종 검증 → §2 Plan 헤더/Task 갱신 → §3 스냅샷 갱신 → §4 완료 보고 → §5 complete.md 저장).
 
-- 미해결 DoD 가 있으면 자동 모드에서도 한 번 묻는다 (3-C-1 분기). 그 외에는 자동.
+- 미해결 DoD 가 있으면 자동 모드에서도 한 번 묻는다 (§1 분기). 그 외에는 자동.
 - `complete.md` 가 이미 존재하면 `/story` 의 y/N 프롬프트를 사용자에게 그대로 전달 (이전 완료 이력 보존 여부).
 
-3-C-5 의 **커밋은 자동으로 수행** (구현 + Plan 분리 커밋 패턴).
-머지 단계는 Step 4 로 이전한다 (3-C-6 의 "통합 방식 선택" 을 wrapper 가 자동 결정).
+§5 의 **커밋은 자동으로 수행** (구현 + Plan 분리 커밋 패턴).
+머지 단계는 Step 4 로 이전한다 (§6 의 "통합 방식 선택" 을 wrapper 가 자동 결정).
 
 ### Step 4. 로컬 머지 + 브랜치 정리
 
@@ -137,7 +137,7 @@ Plan 파일이 없으면 `❌ Plan 파일이 없습니다: <경로>` 출력 후 
 🌿 브랜치 `<branch>` 유지됨 (--no-merge). 수동 머지 또는 `/sdlc:pr <StoryID>` 진행 가능.
 ```
 
-그렇지 않으면 `commands/story.md` 3-C-6 의 **(a) 로컬 머지 경로** 를 자동 수행:
+그렇지 않으면 `templates/phases/story/complete.md §6` 의 **(a) 로컬 머지 경로** 를 자동 수행:
 
 ```bash
 git checkout <branch.main>
@@ -147,7 +147,7 @@ git branch -d <branch.story_prefix><StoryID>-<slug>
 ```
 
 - 머지 메시지 패턴은 `git log --oneline | grep "Merge Story"` 결과가 있으면 1 건 이상 참조해 동일 형식 유지.
-  실사례가 없으면 `commands/story.md` 의 예시 포맷 (`Merge Story E1-S2: make ci 게이트`) 을 기준으로 사용한다.
+  실사례가 없으면 `templates/phases/story/complete.md` 의 예시 포맷 (`Merge Story E1-S2: make ci 게이트`) 을 기준으로 사용한다.
 - 마일스톤 진행 표기 `(M? <달성>/<총>)` 는 스냅샷 데이터에서 추출. 데이터 없으면 생략.
 
 **충돌 발생 시**:
@@ -204,7 +204,7 @@ git branch -d <branch.story_prefix><StoryID>-<slug>
 - **push 는 자동으로 하지 않음**. 사용자 명시 요청 필요.
 - **TDD 의무 Story** (Plan 에서 "TDD 의무" 문구가 있는 Story) 는 자동 진행 시에도
   **테스트 우선 순서 (실패 → 통과)** 를 지킨다. 단순 wrapper 라 `/story` 의 표준 흐름이 그대로 적용되므로 추가 분기 없음 (참고용).
-- **이미 머지된 Story** 재호출 시: `/story start` 의 3-A-1 선행 조건 체크에서
+- **이미 머지된 Story** 재호출 시: `/story start` 의 `start.md §2` 선행 조건 체크에서
   "이미 완료 [x]" 가 잡힘 → 사용자 확인 요청.
 - **세션 중간에 컨텍스트가 끊긴 경우**: `--interactive` 로 재시작 권장.
   자동 모드는 단일 세션 내 전체 흐름을 가정.
@@ -220,6 +220,6 @@ git branch -d <branch.story_prefix><StoryID>-<slug>
 ## 참고 — `/sdlc:story` 와의 관계
 
 - `/sdlc:auto-story` 는 `/sdlc:story` 의 단계별 인스트럭션을 **그대로 따른다** (복붙이 아니라 reference).
-- 단계 정의·검증 로직·Plan 갱신 형식 등을 바꾸려면 `commands/story.md` 를 수정한다 —
+- 단계 정의·검증 로직·Plan 갱신 형식 등을 바꾸려면 `templates/phases/story/{start,verify,complete}.md` 를 수정한다 —
   `/sdlc:auto-story` 는 자동으로 따라간다.
 - `/sdlc:auto-story` 자체는 "언제 자동, 언제 사용자 확인" 정책만 정의한다.

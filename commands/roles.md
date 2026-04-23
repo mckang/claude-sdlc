@@ -30,13 +30,13 @@ allowed-tools: Read, Glob
 
 | 이모지 | 이름 | 키워드 | 역할 | 전문 |
 |--------|------|--------|------|------|
-| 🛡️ | Aria | security | Security Engineer | OWASP·위협 모델링 |
+| 🛡️ | Noor | compliance | Security & Legal | OWASP·위협·개인정보·라이선스 |
 | ... | ... | ... | ... | ... |
 
 총 N+M 명의 페르소나가 사용 가능합니다.
 
 **사용법**: `/sdlc:meeting <키워드1, 키워드2> | <주제> | <산출물경로>`
-**예시**: `/sdlc:meeting architect, backend, security | OAuth 토큰 저장 | ${CLAUDE_PROJECT_DIR}/docs/meetings/oauth.md`
+**예시**: `/sdlc:meeting architect, backend, compliance | OAuth 토큰 저장 | ${CLAUDE_PROJECT_DIR}/docs/meetings/oauth.md`
 
 > 💡 `plan`·`plan-review` 등 자동 참석자 선정은 essential 을 기본으로 고려하고, 주제 키워드가 감지되면 관련 specialized 도 함께 초청합니다.
 ```

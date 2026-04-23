@@ -20,6 +20,7 @@ fi
 
 awk '
 /^## Current Feature$/{flag=1; next}
+/^## /{flag=0}
 flag && /^- name:/{sub(/^- name: */, ""); print; exit}
 flag && /^- \*\*이름\*\*:/{sub(/^- \*\*이름\*\*: */, ""); print; exit}
 ' "$CLAUDE_MD"

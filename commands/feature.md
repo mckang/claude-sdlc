@@ -1,18 +1,22 @@
 ---
-argument-hint: [feature 이름 (kebab-case, 선택)]
-description: 만들고 싶은 것을 대화로 듣고 기능 리스트로 가볍게 정리 — PRD의 씨앗
+argument-hint: [feature 이름 (kebab-case)] | --push <이름> | --pop | --list | --drop <이름>
+description: feature 아이디어 수집 + Current/Stack 관리 (동시 feature 작업 지원)
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
-# Feature 아이디어 수집 명령
+# Feature 아이디어 수집 + 스택 관리 명령
 
-사용자가 `/sdlc:feature [이름]` 형태로 호출했다.
+사용자가 `/sdlc:feature [이름|플래그]` 형태로 호출했다.
 전체 인자: `$ARGUMENTS`
 
 예시:
 ```
-/sdlc:feature                    # 이름 없이 시작 — 대화 중 도출
-/sdlc:feature html5-tetris       # 이름을 먼저 정한 경우
+/sdlc:feature                         # 이름 없이 대화형 수집 (current 로 등록)
+/sdlc:feature html5-tetris            # 이름 지정 + 아이디어 수집
+/sdlc:feature --push hotfix-login     # 현재 Current 를 스택 top 으로 push 후 새 feature 수집
+/sdlc:feature --pop                   # 스택 top 을 Current 로 복원 (수집 과정 없음)
+/sdlc:feature --list                  # Current + Stack 상태 출력
+/sdlc:feature --drop old-abc          # 스택에서 제거
 ```
 
 ## 목적
@@ -20,12 +24,39 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 **아이디어를 가볍게 수집**해 `docs/features/feature-<name>.md` 에 기능 리스트로 정리한다.
 PRD 수준의 FR/NFR·페르소나·성공지표는 다루지 **않는다** (그건 `/sdlc:prd` 단계).
 
-이 커맨드는 **대화형**이다. 한 번에 모든 걸 묻지 말고, 사용자가 자연스럽게
-말하는 대로 받아 적고 중간중간 요약·확인만 한다.
+추가로 이 커맨드는 **Current Feature 의 stack 전환**을 지원한다 — 진행 중인 feature 를 보존한 채 잠깐 다른 feature(핫픽스 등)를 끼워 작업하고 복귀할 수 있다.
 
-## 1단계: 인자 파싱
+이 커맨드는 **대화형**이다 (`--push`/새 이름 경로). `--pop`·`--list`·`--drop` 은 즉시 실행 (상호작용 없음).
 
-- `$1`: feature 이름 (kebab-case, **선택**). 비어있으면 대화 중 사용자와 함께 정한다.
+## 1단계: 인자 파싱 (모드 분기)
+
+`--list` / `--pop` / `--drop <이름>` 은 아이디어 수집 단계를 전혀 타지 않는 **빠른 경로**. 스택 조작만 하고 종료.
+
+```bash
+set -- $ARGUMENTS
+
+case "${1:-}" in
+  --list)
+    bash "${CLAUDE_PLUGIN_ROOT}/scripts/feature-stack.sh" list
+    exit 0 ;;
+  --pop)
+    bash "${CLAUDE_PLUGIN_ROOT}/scripts/feature-stack.sh" pop
+    exit 0 ;;
+  --drop)
+    [ -n "${2:-}" ] || { echo "❌ --drop <이름> 이 필요합니다."; exit 1; }
+    bash "${CLAUDE_PLUGIN_ROOT}/scripts/feature-stack.sh" drop "$2"
+    exit 0 ;;
+  --push)
+    [ -n "${2:-}" ] || { echo "❌ --push <이름> 이 필요합니다."; exit 1; }
+    MODE="push"
+    NAME="$2" ;;
+  --*)
+    echo "❌ 알 수 없는 플래그: $1"; exit 1 ;;
+  *)
+    MODE="set"
+    NAME="${1:-}" ;;
+esac
+```
 
 이름이 주어졌고 kebab-case 가 아니면 한 번만 안내 후 kebab-case 로 교정 제안:
 ```
@@ -165,30 +196,23 @@ ${CLAUDE_PROJECT_DIR}/docs/features/feature-<name>.md
 후속 커맨드(`/sdlc:prd`, `/sdlc:architecture`, `/sdlc:plan`, `/sdlc:story` 등)가
 이름 인자를 생략하면 이 값을 기본값으로 resolve 한다.
 
+모드 분기:
+- `MODE=set` (기본) → 기존 Current 를 그냥 교체 (스택 무변경)
+- `MODE=push` → 기존 Current 를 스택 top 으로 밀어 넣고 새 Current 설정
+
+두 경로 모두 `scripts/feature-stack.sh` 에 위임:
+
 ```bash
-CLAUDE_MD="${CLAUDE_PROJECT_DIR}/CLAUDE.md"
-NAME="<name>"
-TODAY=$(date +%Y-%m-%d)
-
-# CLAUDE.md 가 없으면 생성 (최소 헤더만)
-if [ ! -f "$CLAUDE_MD" ]; then
-  printf '# 프로젝트 가이드\n\n' > "$CLAUDE_MD"
+if [ "$MODE" = "push" ]; then
+  bash "${CLAUDE_PLUGIN_ROOT}/scripts/feature-stack.sh" push "$NAME"
+else
+  bash "${CLAUDE_PLUGIN_ROOT}/scripts/feature-stack.sh" set "$NAME"
 fi
-
-# 기존 Current Feature 섹션 제거 (있으면 — 레거시 **이름** 형식도 함께)
-perl -i -0777 -pe 's/\n*## Current Feature\n(?:-[^\n]*\n)*//g' "$CLAUDE_MD"
-
-# 새 Current Feature 섹션 append (YAML 스타일 키 — 볼드/한국어 라벨 의존 제거)
-{
-  printf '\n## Current Feature\n'
-  printf -- '- name: %s\n' "$NAME"
-  printf -- '- updated: %s\n' "$TODAY"
-} >> "$CLAUDE_MD"
-
-echo "✓ CLAUDE.md 의 Current Feature 를 '$NAME' 로 갱신"
 ```
 
-사용자가 다른 feature 로 전환하고 싶으면 그저 `/sdlc:feature <다른이름>` 을 재호출하면 된다.
+사용자가 다른 feature 로 전환하고 싶으면:
+- **보존하지 않고 교체**: `/sdlc:feature <다른이름>`
+- **잠시 다녀오기 (복귀 예정)**: `/sdlc:feature --push <핫픽스>` → 작업 후 `/sdlc:feature --pop`
 
 ## 7단계: 최종 보고
 

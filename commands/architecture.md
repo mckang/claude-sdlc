@@ -1,6 +1,6 @@
 ---
 argument-hint: [feature 이름 (kebab-case, 생략 시 current feature 사용)]
-description: PRD를 입력으로 아키텍처 문서를 생성하고 팀 표준을 링크 — architect/backend/frontend/dba 협의
+description: PRD를 입력으로 아키텍처 문서를 생성하고 팀 표준을 링크 — architect/backend/frontend/data 협의
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
@@ -91,7 +91,7 @@ PRD 본문에서 다음 키워드를 감지해 스택을 판별:
 | Spring, Java, JPA, Kotlin | `backend/springboot` |
 | Next.js, Node, TypeScript, React | `backend/nextjs-typescript` + `frontend` |
 | FastAPI, Python, Pydantic | `backend/fastapi` |
-| iOS, Android, Flutter, React Native | `frontend` (mobile 맥락) |
+| iOS, Android, Flutter, React Native | `techlead` (Mobile 모자) + `frontend` |
 | Postgres, MySQL, 스키마, 마이그레이션 | `database` |
 
 **스택이 모호하면** 사용자에게 질의:
@@ -140,11 +140,11 @@ database (해당 시):
 ### 주제 기반 추가
 - 백엔드 스택 감지 → `backend`
 - 프론트엔드 스택 감지 → `frontend`
-- DB 변경 암시 → `dba`
-- 보안·인증 FR/NFR → `security`
-- 인프라·배포 중요 → `cloud` + `sre`
-- 데이터/ML → `data`, `ml`
-- 모바일 → `mobile`
+- DB 변경·데이터 파이프라인·ML 암시 → `data`
+- 보안·인증·개인정보·규제 FR/NFR → `compliance`
+- 인프라·배포·SLO·비용 중요 → `platform`
+- 모바일 → `techlead` (Mobile 모자)
+- 사용자 조사·UX·문서 → `discovery`
 
 각 페르소나 `${CLAUDE_PLUGIN_ROOT}/agents/<이름>.md` 를 `Read`.
 
@@ -181,10 +181,10 @@ database (해당 시):
 - **외부 의존성**: 3rd party API, 인프라
 
 #### Round 4: 횡단 관심사
-- **보안** (security): 인증·권한·암호화·감사
+- **보안·규제** (compliance): 인증·권한·암호화·감사·개인정보
 - **성능** (architect/backend): 병목·캐싱·비동기
-- **관찰성** (sre): 로그·메트릭·트레이싱
-- **배포·운영** (cloud/sre): 환경·롤아웃·롤백
+- **관찰성** (platform): 로그·메트릭·트레이싱
+- **배포·운영·비용** (platform): 환경·롤아웃·롤백·비용
 
 #### Round 5: 리스크 / 대안·폐기 결정
 - 기술적 리스크 🔴/🟡/🟢 + 완화

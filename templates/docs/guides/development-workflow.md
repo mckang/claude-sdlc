@@ -114,7 +114,7 @@ Claude가 구현 전에 반드시 다음을 점검:
 
 Story의 담당 영역에 따라:
 - backend Task → `docs/standards/backend/<스택>/` 읽기
-- dba Task → `docs/standards/database/` 읽기
+- data Task → `docs/standards/database/` 읽기
 - frontend Task → `docs/standards/frontend/` 읽기
 
 ### 기존 코드 탐색

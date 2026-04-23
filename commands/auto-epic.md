@@ -68,7 +68,7 @@ Epic ID 누락 시 안내하고 중단:
 /sdlc:auto-epic <EpicID> [Plan경로|feature이름] [--sequential] [--max-parallel N] [--no-merge] [--interactive]
 ```
 
-Plan 경로 resolve 는 `/sdlc:story` 의 인자 파싱 블록 ([commands/story.md:29-60](commands/story.md#L29-L60)) 과 동일 로직 재사용.
+Plan 경로 resolve 는 [`scripts/resolve-plan-path.sh`](../scripts/resolve-plan-path.sh) 를 재사용 (`/sdlc:story` 와 동일).
 Plan 파일 없으면 `❌ Plan 파일이 없습니다: <경로>` 출력 후 중단.
 
 ## 2 단계: Epic 해석 (메인 세션)
@@ -266,7 +266,7 @@ git merge --no-ff story/<STORY_ID>-<slug> \
   -m "Merge Story <STORY_ID>: <제목> (<EpicID>, auto-epic)"
 ```
 
-머지 커밋 메시지는 [commands/story.md:622](commands/story.md#L622) 의 예시 포맷을 기반으로 `(<EpicID>, auto-epic)` 꼬리표를 추가해 배치 실행의 흔적을 남긴다. 마일스톤 진행 `(M? <달성>/<총>)` 는 스냅샷 데이터가 있을 때만 추가.
+머지 커밋 메시지는 [`templates/phases/story/complete.md`](../templates/phases/story/complete.md) 의 예시 포맷(`Merge Story E1-S2: ...`) 을 기반으로 `(<EpicID>, auto-epic)` 꼬리표를 추가해 배치 실행의 흔적을 남긴다. 마일스톤 진행 `(M? <달성>/<총>)` 는 스냅샷 데이터가 있을 때만 추가.
 
 머지 성공 후:
 

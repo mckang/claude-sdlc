@@ -51,7 +51,9 @@ Story 완료 시 `/sdlc:pr` 로 본문 생성. 기본은 `--no-push` (사용자 
 
 ```
 /sdlc:init                                         # 최초 1회
-/sdlc:feature <이름>                                # 대화로 feature 수집 + current 자동 등록
+/sdlc:feature <이름>                                # 대화로 feature 수집 + current 등록
+/sdlc:feature --push <이름>                         # 현재 current 를 스택에 밀고 새 feature (핫픽스 등)
+/sdlc:feature --pop | --list | --drop <이름>        # 스택 조작
 /sdlc:prd [이름]                                    # feature → 공식 PRD (생략 시 current)
 /sdlc:architecture [이름]                           # PRD → 아키텍처 (생략 시 current)
 /sdlc:plan [이름 또는 <PRD> <Arch> <Plan>]          # Epic→Story→Task 분해
@@ -69,6 +71,7 @@ Story 완료 시 `/sdlc:pr` 로 본문 생성. 기본은 `--no-push` (사용자 
 
 산출물 파일명 규약: `docs/<type>/<type>-<name>.md`
 Current Feature 는 `/sdlc:feature` 가 CLAUDE.md 의 `## Current Feature` 섹션에 등록한다.
+**Feature Stack** 은 `## Feature Stack` 섹션에 저장되며, push/pop 으로 동시에 2개 이상의 feature 를 오갈 수 있다 (핫픽스 끼워넣기 등). 후속 커맨드는 항상 **top 이 아닌 Current** 를 참조한다.
 
 ---
 

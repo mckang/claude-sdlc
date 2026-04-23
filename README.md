@@ -1,6 +1,6 @@
 # sdlc — Claude Code SDLC Plugin
 
-Core 7 개 + Extension 11 개 슬래시 커맨드와 21 명의 팀 페르소나로 아이디어→릴리스→회고 전체 생명주기를 지원하는 Claude Code 플러그인.
+Core 7 개 + Extension 11 개 슬래시 커맨드와 13 명의 팀 페르소나로 아이디어→릴리스→회고 전체 생명주기를 지원하는 Claude Code 플러그인.
 
 ## 설치
 
@@ -109,9 +109,9 @@ claude --plugin-dir /path/to/sdlc-plugin
 | 커맨드 | 목적 | 빈도 |
 |---|---|---|
 | `/sdlc:meeting` | 범용 팀 토론 (feature/prd/architecture 외 토픽) | 주 1-2회 |
-| `/sdlc:roles` | 21명 페르소나 목록 | 참조용 |
+| `/sdlc:roles` | 13명 페르소나 목록 | 참조용 |
 
-## 페르소나 (21)
+## 페르소나 (13)
 
 각 페르소나는 frontmatter 의 `tier: essential | specialized` 로 분류된다. 자동 참석자 선정 로직은 essential 을 기본 고려하고, 주제에 따라 specialized 를 합류시킨다. `/sdlc:roles` 는 두 tier 를 분리해 보여준다.
 
@@ -124,16 +124,15 @@ claude --plugin-dir /path/to/sdlc-plugin
 | 구현 | ⚙️ backend · 🎨 frontend |
 | 품질 | 🧪 qa |
 
-### 🧩 Specialized (13) — 주제가 닿을 때만 호출
+### 🧩 Specialized (5) — 주제가 닿을 때만 호출
 
-| 분류 | 페르소나 |
-|---|---|
-| 기획 | 🔍 analyst · 🎭 ux |
-| 설계 | 🧑‍🏫 techlead |
-| 구현 | 📱 mobile |
-| 데이터·인프라 | 🗄️ dba · ☁️ cloud · 📊 data · 🤖 ml |
-| 운영 | 🔭 sre |
-| 지원 | 🛡️ security · 📝 writer · ⚖️ legal · 💰 finops |
+| 키워드 | 페르소나 | 전문 |
+|---|---|---|
+| techlead | 🧑‍🏫 techlead (Sam) | 기술 부채·팀 역량·모바일 플랫폼 |
+| data | 🗄️ data (Dana) | OLTP 스키마·파이프라인·ML (dba+data+ml 통합) |
+| compliance | 🛡️ compliance (Noor) | AppSec·OWASP·GDPR·라이선스 (security+legal 통합) |
+| platform | ⚡ platform (Morgan) | 클라우드 인프라·SRE·FinOps (cloud+sre+finops 통합) |
+| discovery | 🔍 discovery (Alex) | 요구사항 분석·UX·기술 문서 (analyst+ux+writer 통합) |
 
 ## 설치되는 문서 구조
 
@@ -181,6 +180,7 @@ docs/
 
 ## 버전
 
+- **v1.6.0** — 대규모 리팩토링 5종: (1) PreToolUse 훅 추가 — main/master 직접 커밋 차단 + `docs/standards/` 무단 수정 경고. (2) 21개 페르소나 → 13개로 통합 — analyst+ux+writer→discovery, dba+data+ml→data, security+legal→compliance, cloud+sre+finops→platform, mobile 모자를 techlead 에 흡수; 각 페르소나는 멀티-햇 구조로 도메인 전문성 보존. (3) story.md 528줄 → dispatcher(103줄) + 3개 phase 파일(start/verify/complete)로 분리. (4) resolve-plan-path.sh 공통 스크립트 추출 — 13개 커맨드 중복 로직 제거. (5) Feature Stack 지원 — `--push`/`--pop`/`--list`/`--drop` 으로 동시 멀티-feature 작업 가능 (`## Feature Stack` in CLAUDE.md).
 - **v1.5.7** — `CLAUDE.md` 의 `## Current Feature` 섹션 포맷을 YAML 스타일로 변경 (`- **이름**: X` → `- name: X`, `- **최종 갱신**: X` → `- updated: X`). 볼드/한국어 라벨 의존 제거로 사용자가 마크다운 포맷 건드려도 깨지지 않음. `scripts/resolve-current-feature.sh` 는 신·구 두 형식 모두 파싱 (backward compat). 기존 프로젝트는 그대로 동작하며, 다음 `/sdlc:feature` 호출 시 신 형식으로 자동 전환.
 - **v1.5.6** — `/sdlc:auto-story` · `/sdlc:auto-epic` 상단에 "⚠️ Power-user" 배너와 "언제 쓸까 / 언제 쓰지 말까" 결정 표 추가. README 의 자동화 섹션에도 주의문 삽입. 동작 변화 없음 — 문서만.
 - **v1.5.5** — 보고서 템플릿 외부화: `story.md` 의 kickoff/verify/complete 3 템플릿과 `plan.md` 의 Plan·deps 2 템플릿을 `${CLAUDE_PLUGIN_ROOT}/templates/reports/{story,plan}/*.md` 로 분리. 커맨드 파일은 "이 템플릿을 Read 해서 쓰라" + "핵심 준수 사항" 만 짧게 기술. story.md 652 → 528 줄 (-124), plan.md 413 → 296 줄 (-117). 동작 변화 없음.

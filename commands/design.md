@@ -150,7 +150,7 @@ mkdir -p "$DESIGN_DIR"
 #### 참석자
 - 주도: `backend` (`${CLAUDE_PLUGIN_ROOT}/agents/backend.md`)
 - 참석: `architect`, `techlead`
-- 조건부: `security` — PRD 또는 아키텍처에서 인증·권한·암호화 언급 감지 시 포함
+- 조건부: `compliance` — PRD 또는 아키텍처에서 인증·권한·암호화 언급 감지 시 포함
 - 진행: `facilitator`
 
 각 페르소나 `.md` 를 `Read` 로 로드해 어조·관점을 반영.
@@ -167,14 +167,14 @@ mkdir -p "$DESIGN_DIR"
 - 초기 엔드포인트 표 도출 (method/path/요약/인증 여부)
 - 누락·중복 점검 (architect 교차 확인)
 
-**Round 2 — 엔드포인트 상세 (backend + security)**
+**Round 2 — 엔드포인트 상세 (backend + compliance)**
 - 각 엔드포인트마다:
   - Request: path params / query / body 스키마
   - Response: 성공(200/201) 스키마 + 에러(4xx/5xx) 스키마
   - 에러 코드 표
   - 예시 요청·응답 JSON (최소 정상 1건 + 에러 1건)
   - Rate limit / idempotency / 멱등 키 필요 여부
-- security 가 민감 엔드포인트(로그인·결제·개인정보) 에서 추가 헤더·감사 로그 요구 사항 제기
+- compliance 가 민감 엔드포인트(로그인·결제·개인정보) 에서 추가 헤더·감사 로그 요구 사항 제기
 
 **Round 3 — 공통 규격 (techlead + backend)**
 - 에러 응답 포맷(코드 체계, trace-id 포함 여부)
@@ -193,7 +193,7 @@ mkdir -p "$DESIGN_DIR"
 - **작성일**: YYYY-MM-DD
 - **참조 PRD**: ../../prd/prd-$NAME.md
 - **참조 아키텍처**: ../../architecture/architecture-$NAME.md
-- **참석자**: backend, architect, techlead, security?, facilitator
+- **참석자**: backend, architect, techlead, compliance?, facilitator
 - **상태**: draft
 
 ## 엔드포인트 개요
@@ -259,7 +259,7 @@ mkdir -p "$DESIGN_DIR"
 ### 5-B. UI 트랙 (TRACK_UI=1 일 때)
 
 #### 참석자
-- 주도: `ux` (`${CLAUDE_PLUGIN_ROOT}/agents/ux.md`)
+- 주도: `discovery` (`${CLAUDE_PLUGIN_ROOT}/agents/discovery.md`)
 - 참석: `frontend`, `architect` (접근성·성능 교차 검토)
 - 진행: `facilitator`
 
@@ -270,12 +270,12 @@ mkdir -p "$DESIGN_DIR"
 
 #### 회의 라운드
 
-**Round 1 — 디자인 원칙 (ux 주도)**
+**Round 1 — 디자인 원칙 (discovery 주도)**
 - 이 feature 의 UI 가 지향하는 원칙 2-4 줄 (예: "밀도 높지만 실수 방지", "1차 액션만 강조")
 - 페르소나 분석 결과와 정합성 확인
 - 이후 라운드에서 토큰·컴포넌트가 원칙과 어긋나면 오픈 이슈에 기록.
 
-**Round 2 — 토큰 정의 (ux + frontend)**
+**Round 2 — 토큰 정의 (discovery + frontend)**
 - 색: primary / secondary / semantic(success·warning·danger·info) / neutral 스케일
 - 타이포: 스케일(h1~caption) / 각 스케일의 size·line-height·weight / font family
 - 간격: 4px 또는 8px 기반 스케일 (spacing-1 ~ spacing-12 식)
@@ -308,7 +308,7 @@ mkdir -p "$DESIGN_DIR"
 - **작성일**: YYYY-MM-DD
 - **참조 PRD**: ../../prd/prd-$NAME.md
 - **참조 아키텍처**: ../../architecture/architecture-$NAME.md
-- **참석자**: ux, frontend, architect, facilitator
+- **참석자**: discovery, frontend, architect, facilitator
 - **상태**: draft
 
 ## 디자인 원칙
@@ -367,7 +367,7 @@ mkdir -p "$DESIGN_DIR"
 ### 5-C. Mockup 트랙 (TRACK_MOCKUP=1 일 때)
 
 #### 참석자
-- 주도: `ux`
+- 주도: `discovery`
 - 참석: `frontend`, `pm` (유스케이스 매핑 확인)
 - 진행: `facilitator`
 
@@ -378,17 +378,17 @@ mkdir -p "$DESIGN_DIR"
 
 #### 회의 라운드
 
-**Round 1 — 화면 리스트 도출 (ux + pm)**
+**Round 1 — 화면 리스트 도출 (discovery + pm)**
 - 유스케이스 하나하나를 화면(들)로 매핑
 - 화면 3-6 개로 수렴 (너무 많으면 Story 단위로 쪼갤 수 있음 — pm 판단)
 - 각 화면에 ID 부여 (S1, S2, ...)
 
-**Round 2 — 화면 흐름도 (ux 주도)**
+**Round 2 — 화면 흐름도 (discovery 주도)**
 - Mermaid `graph LR` 로 화면 간 전이
 - 조건 분기(성공/에러)는 라벨로 표시
 - 외부 진입점(딥링크·알림 등) 과 이탈점(완료·취소) 명시
 
-**Round 3 — 화면별 와이어프레임 + 요소 + 상태 (ux + frontend)**
+**Round 3 — 화면별 와이어프레임 + 요소 + 상태 (discovery + frontend)**
 - Round 1 의 각 화면(S1, S2, ...)마다:
   - ASCII 와이어프레임 (박스·구분선 사용, 모바일/데스크톱 구분이 의미 있으면 둘 다)
   - 요소 표: 영역 / 컴포넌트(UI 트랙의 인벤토리 참조) / 상태 / 동작
@@ -406,7 +406,7 @@ mkdir -p "$DESIGN_DIR"
 - **작성일**: YYYY-MM-DD
 - **참조 PRD**: ../../prd/prd-$NAME.md
 - **참조 UI 디자인 시스템**: ui.md (있을 때)
-- **참석자**: ux, frontend, pm, facilitator
+- **참석자**: discovery, frontend, pm, facilitator
 - **상태**: draft
 
 ## 화면 리스트
@@ -518,7 +518,7 @@ Feature: {제목}
 
 ## 주의사항
 
-- 신규 페르소나를 만들지 말 것 — 기존 21 개 안에서만 선택.
+- 신규 페르소나를 만들지 말 것 — 기존 13 개 안에서만 선택.
 - 트랙 순서는 **API → UI → Mockup** 고정 (Mockup 이 UI 토큰을 참조할 수 있도록).
 - 기존 파일을 **자동 덮어쓰지 말 것** — 항상 사용자 확인. 단, `README.md` 인덱스는 예외(항상 갱신).
 - archive 디렉터리는 **파일 단위**로 만들 것(트랙 하나만 덮어써도 그 파일만 백업).

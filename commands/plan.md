@@ -20,7 +20,6 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 전체 인자: `$ARGUMENTS`
 
 ```bash
-# 공백으로 분리
 set -- $ARGUMENTS
 
 if [ "$#" -eq 3 ]; then
@@ -28,26 +27,12 @@ if [ "$#" -eq 3 ]; then
   PRD="$1"; ARCH="$2"; OUT="$3"
   NAME=$(basename "$PRD" .md | sed 's/^prd-//')
 elif [ "$#" -le 1 ]; then
-  # 형식 1 또는 2: feature 이름 resolve
-  NAME="$1"
-  if [ -z "$NAME" ]; then
-    NAME=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-current-feature.sh")
-    if [ -z "$NAME" ]; then
-      cat <<'EOF'
-❌ feature 이름이 지정되지 않았고, CLAUDE.md 에 Current Feature 도 없습니다.
-
-다음 중 하나:
-  /sdlc:feature <이름>   # feature 부터 시작
-  /sdlc:plan <이름>      # 이름을 직접 지정
-  /sdlc:plan <prd경로> <arch경로> <out경로>   # 명시 경로
-EOF
-      exit 1
-    fi
-    echo "ℹ️  Current Feature 사용: $NAME"
-  fi
+  # 형식 1 또는 2: feature 이름 (또는 current) → NAME·PLAN resolve
+  OUT_ARG=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-plan-path.sh" "${1:-}") || exit 1
+  NAME=$(sed -n 1p <<<"$OUT_ARG")
+  OUT=$(sed -n 2p <<<"$OUT_ARG")
   PRD="${CLAUDE_PROJECT_DIR}/docs/prd/prd-$NAME.md"
   ARCH="${CLAUDE_PROJECT_DIR}/docs/architecture/architecture-$NAME.md"
-  OUT="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
 else
   echo "❌ 인자 수가 맞지 않습니다 (0, 1, 또는 3개 허용)."
   exit 1
@@ -137,9 +122,9 @@ fi
 주제에 따라 추가:
 - 백엔드 작업 있으면 → `backend`
 - 프론트엔드 작업 있으면 → `frontend`
-- DB 스키마 변경 있으면 → `dba`
+- DB 스키마 변경 있으면 → `data`
 - 테스트 전략 필요하면 → `qa`
-- 보안 결정 포함되면 → `security`
+- 보안 결정 포함되면 → `compliance`
 - 출시 시점 중요하면 → `pm`
 
 각 페르소나의 `${CLAUDE_PLUGIN_ROOT}/agents/<이름>.md`를 `Read`로 로드.
@@ -181,7 +166,7 @@ Epic E4: 주문 관리
 
 각 Epic마다 순서대로 진행:
 
-**참여**: scrum-master (주도), architect, backend/frontend/dba/qa (주제별)
+**참여**: scrum-master (주도), architect, backend/frontend/data/qa (주제별)
 
 **목표**: 각 Epic을 **수직 슬라이스 Story**로 분해
 
@@ -191,7 +176,7 @@ Scrum Master가 각 Epic을 3-7개 Story로 쪼개고, 각 Story마다:
 - **설명**: 1-2문장
 - **수용 기준 (AC)**: 2-5개, Given-When-Then
 - **T-shirt size**: S/M/L/XL
-- **담당 영역**: backend / frontend / dba / mobile / mixed
+- **담당 영역**: backend / frontend / data / mobile / mixed
 
 구현 페르소나가 공수·실현 가능성 검증 ("이거 L이다", "XL인데 쪼개야 한다").
 
@@ -204,12 +189,12 @@ XL 나오면 즉시 재분해.
 Task 형식:
 - **ID**: E1-S1-T1
 - **제목**: 구체적 작업 (코드·DB·설정·테스트)
-- **담당**: backend / frontend / dba / qa
+- **담당**: backend / frontend / data / qa
 - **T-shirt size**: S/M (대부분 S-M, L 이상은 Story로 쪼개야 신호)
 
 Task 예:
 ```
-E1-S1-T1: users 테이블 마이그레이션 작성 (dba, S)
+E1-S1-T1: users 테이블 마이그레이션 작성 (data, S)
 E1-S1-T2: POST /api/v1/auth/signup 엔드포인트 (backend, M)
 E1-S1-T3: 회원가입 폼 UI (frontend, M)
 E1-S1-T4: 통합 테스트 작성 (qa, S)
@@ -227,7 +212,7 @@ E1-S1-T4: 통합 테스트 작성 (qa, S)
 5. **리스크** 분류 (🔴/🟡/🟢) 및 완화책
 6. **버퍼** 명시 (전체의 20%)
 
-각 전문가가 자기 영역의 숨은 의존성·리스크 제기 (예: Security가 "인증 통합 전에 보안 리뷰 필요", DBA가 "이 마이그레이션은 온라인으로 안 됨, 다운타임 필요").
+각 전문가가 자기 영역의 숨은 의존성·리스크 제기 (예: Compliance가 "인증 통합 전에 보안 리뷰 필요", Data 엔지니어가 "이 마이그레이션은 온라인으로 안 됨, 다운타임 필요").
 
 ## 6단계: 산출물 작성
 

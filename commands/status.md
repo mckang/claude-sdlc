@@ -24,26 +24,23 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 ### Plan 경로 resolve
 
+플래그와 위치 인자를 분리한 뒤 `scripts/resolve-plan-path.sh` 로 NAME·PLAN 을 한 번에 resolve.
+
 ```bash
-ARG1="$1"
-ARG2="$2"
+# 플래그 분리
+POSITIONAL=()
+UPDATE_FLAG=0
+for a in "$@"; do
+  case "$a" in
+    --update) UPDATE_FLAG=1 ;;
+    *) POSITIONAL+=("$a") ;;
+  esac
+done
 
-if [ -z "$ARG1" ] || [[ "$ARG1" == --* ]]; then
-  # current feature 사용. $1 이 플래그면 $2 대신 $1 로 처리.
-  [[ "$ARG1" == --* ]] && ARG2="$ARG1"
-  NAME=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-current-feature.sh")
-  if [ -z "$NAME" ]; then
-    echo "❌ Plan 경로 미지정 + Current Feature 없음. 사용 가능한 Plan 목록:"
-    ls "${CLAUDE_PROJECT_DIR}/docs/plans/"plan-*.md 2>/dev/null || echo "  (없음)"
-    exit 1
-  fi
-  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
-elif [ -f "$ARG1" ]; then
-  PLAN="$ARG1"
-else
-  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$ARG1.md"
-fi
-
+ARG="${POSITIONAL[0]:-}"
+OUT=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-plan-path.sh" "$ARG") || exit 1
+NAME=$(sed -n 1p <<<"$OUT")
+PLAN=$(sed -n 2p <<<"$OUT")
 test -f "$PLAN" || { echo "❌ Plan 파일 없음: $PLAN"; exit 1; }
 ```
 
@@ -73,7 +70,7 @@ T-shirt size 태그 추출 (S/M/L/XL) — 각 상태별 규모 합산용.
 
 ### 담당 영역
 
-`담당 영역: backend, dba` 형태에서 영역별 진행도 계산.
+`담당 영역: backend, data` 형태에서 영역별 진행도 계산.
 
 ### 마일스톤
 
@@ -104,7 +101,7 @@ T-shirt size 태그 추출 (S/M/L/XL) — 각 상태별 규모 합산용.
 
 ### 영역별 진행률
 
-backend / frontend / dba / qa 등 각 영역의 진행률.
+backend / frontend / data / qa 등 각 영역의 진행률.
 
 ### 크리티컬 패스 진행
 
@@ -161,7 +158,7 @@ Task:   ██████████░░░░░  28/52 (54%)
 |------|-------|
 | backend | 60% (6/10) |
 | frontend | 25% (2/8) |
-| dba | 100% (3/3) |
+| data | 100% (3/3) |
 | qa | 30% (2/6) |
 
 ## 크리티컬 패스 상태
@@ -177,7 +174,7 @@ Task:   ██████████░░░░░  28/52 (54%)
 ## ⚠️ 블로킹 이슈 (1건)
 
 ### E2-S1-T3: SES 프로덕션 access 요청 승인 대기
-- 담당: backend + cloud
+- 담당: backend + platform
 - 시작일: Plan 작성일 + 5일
 - 블로킹 사유: AWS SES 샌드박스 → 프로덕션 전환 심사 중
 - 예상 해제일: 불명
@@ -244,13 +241,13 @@ Plan 파일 상단(메타데이터 아래)에 `## 📊 최근 상태 스냅샷` 
 사용자가 Plan을 편집하며 진행 상황을 남기려면:
 
 ```markdown
-#### E1-S1: 토큰 테이블 마이그레이션 (DBA, M)
+#### E1-S1: 토큰 테이블 마이그레이션 (data, M)
 <!-- 상태: done -->
 
 **Task**:
-- [x] E1-S1-T1: users 테이블 컬럼 추가 마이그레이션 (dba, S)
-- [x] E1-S1-T2: email_verification_tokens 테이블 생성 (dba, S)
-- [~] E1-S1-T3: 온라인 마이그레이션 POC (dba, M)  ← 진행중
-- [!] E1-S1-T4: 스테이징 적용 (dba, S)            ← 블로킹
-- [ ] E1-S1-T5: 프로덕션 적용 (dba, S)             ← 예정
+- [x] E1-S1-T1: users 테이블 컬럼 추가 마이그레이션 (data, S)
+- [x] E1-S1-T2: email_verification_tokens 테이블 생성 (data, S)
+- [~] E1-S1-T3: 온라인 마이그레이션 POC (data, M)  ← 진행중
+- [!] E1-S1-T4: 스테이징 적용 (data, S)            ← 블로킹
+- [ ] E1-S1-T5: 프로덕션 적용 (data, S)             ← 예정
 ```

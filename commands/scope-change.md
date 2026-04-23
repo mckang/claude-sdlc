@@ -27,45 +27,28 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 ### Plan 경로 및 사유 분리
 
+첫 인자가 Plan 지시자(파일 경로 또는 kebab-case 이름) 면 `$2` 가 사유.
+그렇지 않으면 `$1` 전체를 사유로 쓰고 Plan 은 current feature 로 resolve.
+
 ```bash
-ARG1="$1"
-ARG2="$2"
+ARG1="${1:-}"
+ARG2="${2:-}"
 
 is_kebab_name() {
-  # 슬래시·점이 없고 소문자·숫자·하이픈만이면 kebab-case 이름으로 간주
   [[ "$1" =~ ^[a-z0-9][a-z0-9-]*$ ]]
 }
 
 if [ -z "$ARG1" ]; then
-  # current feature 사용, 사유 없음
-  PLAN_SRC=""
-  REASON=""
-elif [ -f "$ARG1" ]; then
-  PLAN_SRC="$ARG1"
-  REASON="$ARG2"
-elif is_kebab_name "$ARG1"; then
-  PLAN_SRC="$ARG1"  # feature 이름
-  REASON="$ARG2"
+  PLAN_ARG=""; REASON=""
+elif [ -f "$ARG1" ] || is_kebab_name "$ARG1"; then
+  PLAN_ARG="$ARG1"; REASON="$ARG2"
 else
-  # $1 이 사유 문자열인 경우
-  PLAN_SRC=""
-  REASON="$ARG1"
+  PLAN_ARG=""; REASON="$ARG1"
 fi
 
-# PLAN 경로 확정
-if [ -z "$PLAN_SRC" ]; then
-  NAME=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-current-feature.sh")
-  if [ -z "$NAME" ]; then
-    echo "❌ Plan 경로 미지정 + Current Feature 없음."
-    exit 1
-  fi
-  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
-elif [ -f "$PLAN_SRC" ]; then
-  PLAN="$PLAN_SRC"
-else
-  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$PLAN_SRC.md"
-fi
-
+OUT=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-plan-path.sh" "$PLAN_ARG") || exit 1
+NAME=$(sed -n 1p <<<"$OUT")
+PLAN=$(sed -n 2p <<<"$OUT")
 test -f "$PLAN" || { echo "❌ Plan 파일 없음: $PLAN"; exit 1; }
 ```
 
@@ -256,7 +239,7 @@ Plan 상단에 "## 🔄 변경 이력" 섹션이 없으면 생성, 있으면 맨
 - 옵션 B: 외부 2FA 서비스 (Authy) → 거절 사유: 비용
 
 ## 승인 이력
-- 요청: Security team (Aria)
+- 요청: Compliance (Noor)
 - 승인: PM (John)
 - 통지: Dev team 전체
 

@@ -100,12 +100,11 @@ docs/prd/prd-<name>.md 가 이미 존재합니다.
 
 ### 주제 기반 추가
 feature.md 의 내용에서 다음을 감지해 참석자 추가:
-- UI/UX 언급 → `ux`
+- UI/UX·사용자 조사·문서 → `discovery`
 - 백엔드·API 중심 → `techlead` + `backend`
-- 데이터·분석 → `analyst`
-- 보안·인증 → `security`
-- 규제·컴플라이언스 → `legal`
-- 결제·과금 → `finops`
+- 데이터·분석·ML → `data`
+- 보안·인증·개인정보·규제 → `compliance`
+- 결제·과금·비용·운영 → `platform`
 
 각 참석자의 `${CLAUDE_PLUGIN_ROOT}/agents/<이름>.md` 를 `Read` 로 로드.
 

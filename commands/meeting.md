@@ -51,8 +51,8 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 1. **참석자 기반 매핑**:
    - `backend` 참석 → 주제에서 스택 키워드를 찾고 해당 `${CLAUDE_PROJECT_DIR}/docs/standards/backend/<스택>/` 파일들 읽기
    - `frontend` 참석 → `${CLAUDE_PROJECT_DIR}/docs/standards/frontend/*.md` 전부
-   - `dba` 참석 → `${CLAUDE_PROJECT_DIR}/docs/standards/database/*.md` 전부
-   - `security` 참석 → 해당 스택의 `security.md`
+   - `data` 참석 → `${CLAUDE_PROJECT_DIR}/docs/standards/database/*.md` 전부
+   - `compliance` 참석 → 해당 스택의 `security.md`
    - `qa` 참석 → 해당 스택의 `testing.md` + `${CLAUDE_PROJECT_DIR}/docs/standards/frontend/testing.md` (프론트 주제면)
    - `architect` 참석 → 주제 관련 스택의 `structure.md`, `api.md` 와 `database/schema-design.md`
 
@@ -80,7 +80,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ### 예시
 
 주제: "Spring Boot에서 OAuth 토큰 저장 전략"
-참석자: architect, backend, security
+참석자: architect, backend, compliance
 
 → 자동 로드:
 - `${CLAUDE_PROJECT_DIR}/docs/standards/backend/springboot/api.md`

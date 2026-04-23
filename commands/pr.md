@@ -24,26 +24,19 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 - `--draft` (선택): Draft PR로 생성
 - `--no-push`: 푸시·PR 생성 없이 **본문과 명령어만** 출력 (가장 안전)
 
-### Plan 파일 resolve (story.md와 동일 패턴)
+### Plan 파일 resolve
+
+`$1` 은 Story ID. 두 번째 **비-플래그** 인자를 `scripts/resolve-plan-path.sh` 에 넘긴다.
 
 ```bash
-STORY_ID="$1"
-ARG2="$2"
-# 플래그는 $2 가 아닐 수 있으니 실제 파싱 시 --로 시작하면 ARG2 를 빈 값으로 처리
-
-if [ -z "$ARG2" ] || [[ "$ARG2" == --* ]]; then
-  NAME=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-current-feature.sh")
-  if [ -z "$NAME" ]; then
-    echo "❌ Plan 경로 미지정 + Current Feature 없음."
-    exit 1
-  fi
-  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
-elif [ -f "$ARG2" ]; then
-  PLAN="$ARG2"
-else
-  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$ARG2.md"
-fi
-
+STORY_ID="$1"; shift || true
+ARG=""
+for a in "$@"; do
+  case "$a" in --*) ;; *) ARG="$a"; break ;; esac
+done
+OUT=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-plan-path.sh" "$ARG") || exit 1
+NAME=$(sed -n 1p <<<"$OUT")
+PLAN=$(sed -n 2p <<<"$OUT")
 test -f "$PLAN" || { echo "❌ Plan 파일이 없습니다: $PLAN"; exit 1; }
 ```
 

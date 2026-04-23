@@ -27,25 +27,18 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ### Plan 경로 및 산출물 경로 resolve
 
 ```bash
-ARG1="$1"
-ARG2="$2"
+# 첫 비-플래그 인자는 Plan 지시자, 두 번째는 산출물 경로
+POS=()
+for a in "$@"; do
+  case "$a" in --*) ;; *) POS+=("$a") ;; esac
+done
 
-if [ -z "$ARG1" ] || [[ "$ARG1" == --* ]]; then
-  NAME=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-current-feature.sh")
-  if [ -z "$NAME" ]; then echo "❌ Plan 경로 미지정 + Current Feature 없음."; exit 1; fi
-  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
-elif [ -f "$ARG1" ]; then
-  PLAN="$ARG1"; NAME=$(basename "$PLAN" .md | sed 's/^plan-//')
-else
-  NAME="$ARG1"; PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
-fi
+OUT_ARG=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-plan-path.sh" "${POS[0]:-}") || exit 1
+NAME=$(sed -n 1p <<<"$OUT_ARG")
+PLAN=$(sed -n 2p <<<"$OUT_ARG")
 test -f "$PLAN" || { echo "❌ Plan 파일 없음: $PLAN"; exit 1; }
 
-if [ -z "$ARG2" ] || [[ "$ARG2" == --* ]]; then
-  OUT="${CLAUDE_PROJECT_DIR}/docs/retrospectives/retro-$NAME.md"
-else
-  OUT="$ARG2"
-fi
+OUT="${POS[1]:-${CLAUDE_PROJECT_DIR}/docs/retrospectives/retro-$NAME.md}"
 mkdir -p "$(dirname "$OUT")"
 ```
 
@@ -88,9 +81,9 @@ mkdir -p "$(dirname "$OUT")"
 **자동 추가** (Plan의 "담당 영역" 에서 감지):
 - backend가 Plan에 있었으면 → `backend`
 - frontend → `frontend`
-- dba → `dba`
+- data → `data`
 - qa → `qa`
-- security → `security`
+- compliance → `compliance`
 
 **추가로 포함** (항상):
 - `pm` (John) — 비즈니스 관점 회고

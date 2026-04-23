@@ -119,7 +119,7 @@ AC-2: 잘못된 비밀번호
 3. **각 Story에 DoD·AC 작성**
 4. **각 Story를 Task로 분해**
    - 실제 작업 단위 (코드·DB·설정·테스트)
-   - 담당 영역 식별 (backend / frontend / dba / qa)
+   - 담당 영역 식별 (backend / frontend / data / qa)
 5. **T-shirt size 부여**
 6. **XL 있으면 재분해 요청**
 

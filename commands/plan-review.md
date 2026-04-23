@@ -33,34 +33,17 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ### Plan 경로 및 산출물 경로 resolve
 
 ```bash
-ARG1="$1"
-ARG2="$2"
+POS=()
+for a in "$@"; do
+  case "$a" in --*) ;; *) POS+=("$a") ;; esac
+done
 
-# Plan 경로 확정
-if [ -z "$ARG1" ] || [[ "$ARG1" == --* ]]; then
-  NAME=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-current-feature.sh")
-  if [ -z "$NAME" ]; then
-    echo "❌ Plan 경로 미지정 + Current Feature 없음."
-    exit 1
-  fi
-  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
-elif [ -f "$ARG1" ]; then
-  PLAN="$ARG1"
-  NAME=$(basename "$PLAN" .md | sed 's/^plan-//')
-else
-  NAME="$ARG1"
-  PLAN="${CLAUDE_PROJECT_DIR}/docs/plans/plan-$NAME.md"
-fi
-
+OUT_ARG=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-plan-path.sh" "${POS[0]:-}") || exit 1
+NAME=$(sed -n 1p <<<"$OUT_ARG")
+PLAN=$(sed -n 2p <<<"$OUT_ARG")
 test -f "$PLAN" || { echo "❌ Plan 파일 없음: $PLAN"; exit 1; }
 
-# 산출물 경로 확정
-if [ -z "$ARG2" ] || [[ "$ARG2" == --* ]]; then
-  OUT="${PLAN%.md}.review.md"
-else
-  OUT="$ARG2"
-fi
-
+OUT="${POS[1]:-${PLAN%.md}.review.md}"
 mkdir -p "$(dirname "$OUT")"
 ```
 
@@ -70,7 +53,7 @@ mkdir -p "$(dirname "$OUT")"
 `Read` 로 Plan 파일을 읽고 다음 추출:
 - 제목 · 작성일 · 참조 PRD · 참조 아키텍처 · 참조 표준 · 기술 스택
 - 총 Epic/Story/Task 수
-- Story 담당 영역(`담당 영역: backend/frontend/dba/qa/security/pm/...`)
+- Story 담당 영역(`담당 영역: backend/frontend/data/qa/compliance/pm/...`)
 - T-shirt size 분포 (S/M/L/XL 개수)
 - 마일스톤·크리티컬 패스·리스크 목록
 
@@ -112,9 +95,9 @@ Plan 의 참조 섹션에서 경로 추출 후 `Read`:
 **자동 추가** (Plan 의 담당 영역에 나타난 경우):
 - `backend` → `backend`
 - `frontend` → `frontend`
-- `dba` → `dba`
+- `data` → `data`
 - `qa` → `qa`
-- `security` → `security`
+- `compliance` → `compliance`
 - `pm` → `pm`
 
 상한 8명. 넘으면 Plan 에 가장 많이 등장한 담당 영역 우선.
