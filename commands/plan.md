@@ -147,11 +147,11 @@ fi
 
 **참여**: scrum-master, architect, pm
 
-**목표**: PRD의 기능 요구사항을 **Epic 단위**로 묶기. 보통 3-8개.
+**목표**: PRD의 기능 요구사항을 **Epic 단위**로 묶기. 보통 1-3개 (규모가 큰 PRD 는 최대 5개).
 
 Epic 조건:
-- 비즈니스 가치 단위
-- 3-5일 이상의 통합 작업
+- 비즈니스 가치 덩어리 (마일스톤 또는 릴리스 1개에 대응)
+- **2-4주 이상**의 다수 스프린트 통합 작업 — 단일 Story 수준으로 잘게 쪼개지 말 것
 - PRD의 주요 섹션 하나 ≈ Epic 하나
 
 출력 예:
@@ -170,27 +170,27 @@ Epic E4: 주문 관리
 
 **목표**: 각 Epic을 **수직 슬라이스 Story**로 분해
 
-Scrum Master가 각 Epic을 3-7개 Story로 쪼개고, 각 Story마다:
+Scrum Master가 각 Epic을 **5-10개 Story** 로 쪼개고, 각 Story마다:
 - **ID**: E1-S1 형식
 - **제목**: 동사로 시작, 사용자 관점
 - **설명**: 1-2문장
 - **수용 기준 (AC)**: 2-5개, Given-When-Then
-- **T-shirt size**: S/M/L/XL
+- **T-shirt size**: S/M/L/XL — 실제 일 단위는 [scrum-master 페르소나](../agents/scrum-master.md) 의 T-shirt 표 (S 0.5-1일 / M 2-3일 / L 4-7일 / XL 8일+) 를 따른다. **1 스프린트 (약 10일) 내 완료 가능**이 Story 크기 기준.
 - **담당 영역**: backend / frontend / data / mobile / mixed
 
 구현 페르소나가 공수·실현 가능성 검증 ("이거 L이다", "XL인데 쪼개야 한다").
 
-XL 나오면 즉시 재분해.
+**XL (8일+) 은 스프린트에 들어가지 않으므로 즉시 재분해**.
 
 ### Round 3: Task 분해
 
-각 Story를 2-5개 Task로 분해.
+각 Story를 2-6개 Task로 분해.
 
 Task 형식:
 - **ID**: E1-S1-T1
 - **제목**: 구체적 작업 (코드·DB·설정·테스트)
 - **담당**: backend / frontend / data / qa
-- **T-shirt size**: S/M (대부분 S-M, L 이상은 Story로 쪼개야 신호)
+- **T-shirt size**: S (4시간 이하) / M (4-8시간 ≈ 1일) — **PR 1개 단위가 기본**. L 이상 나오면 Story 로 다시 쪼개야 한다는 신호.
 
 Task 예:
 ```
