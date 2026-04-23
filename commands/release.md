@@ -255,3 +255,150 @@ GONOGO_RESULT="T'Challa: GO, Thor: GO, 최종: GO"
 Phase 3로 계속 진행한다.
 
 어느 한 페르소나라도 NO-GO이면 이미 위에서 중단되었으므로 이 지점에 도달하지 않는다.
+
+## 4단계: Phase 3 — 배포 안내 및 롤백 문서화
+
+> 목적: 버전 태그 안내, 릴리스 노트 자동 생성, 롤백 기준·명령어를 문서화한다.
+> 이 단계는 한 번 진입하면 중단 없이 끝까지 완료한다.
+
+---
+
+### 1. Git 태그 안내
+
+다음 명령어를 실행하여 최신 태그를 확인한다:
+
+```bash
+git tag --sort=-v:refname | head -1
+```
+
+**버전 결정 규칙:**
+- 태그가 없으면 → `v0.1.0` 제안
+- 태그가 있으면 → patch 버전을 1 올린다 (예: `v1.2.3` → `v1.2.4`)
+
+결정된 버전을 `$VERSION` 변수에 저장한다.
+
+다음 내용을 출력한다 (Claude는 직접 실행하지 않고 사용자에게 안내만 한다):
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 Phase 3: 배포 안내
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+제안 버전: v<X.Y.Z>
+
+아래 명령어를 직접 실행하세요:
+
+# 1. Git 태그
+git tag v<X.Y.Z> && git push origin v<X.Y.Z>
+
+# 2. 배포
+#    CI/CD 파이프라인이 태그 push로 자동 트리거되는 경우: 위로 완료
+#    수동 배포가 필요한 경우: docs/guides/development-workflow.md 참조
+```
+
+(`v<X.Y.Z>` 자리에 실제 `$VERSION` 값을 출력한다.)
+
+---
+
+### 2. 릴리스 노트 자동 생성
+
+**Feature 모드(`MODE="feature"`):**
+
+`${CLAUDE_PROJECT_DIR}/docs/plans/${NAME}/` 하위의 모든 Story 디렉터리를 스캔한다.
+각 Story 디렉터리에서 `complete.md` 파일이 존재하면:
+- 파일의 첫 번째 `# ` 헤딩을 Story 제목으로 추출한다.
+- Story 제목에 "수정", "버그", "fix" 중 하나라도 포함되면 prefix를 `fix:` 로, 그 외에는 `feat:` 로 설정한다.
+
+아래 형식으로 릴리스 노트를 생성한다:
+
+```markdown
+## 변경 내역 — <NAME> (<TODAY>)
+
+- feat: E1-S1 <Story 1 제목>
+- feat: E1-S2 <Story 2 제목>
+- fix:  E1-S3 <Story 3 제목>
+```
+
+**Story 모드(`MODE="story"`):**
+
+`${CLAUDE_PROJECT_DIR}/docs/plans/${NAME}/${STORY_ID}/complete.md` 단 하나의 항목만 포함한다.
+
+```markdown
+## 변경 내역 — <NAME> (<TODAY>)
+
+- feat: <STORY_ID> <Story 제목>
+```
+
+**dry-run 모드(`DRY_RUN=true` 이면):**
+
+실제 파일을 읽지 않고 아래 플레이스홀더를 출력한다:
+
+```markdown
+## 변경 내역 — <NAME> (<TODAY>)
+
+- (dry-run: 실제 Story complete.md 미확인)
+```
+
+생성된 릴리스 노트를 `$RELEASE_NOTES` 변수에 저장한다.
+
+---
+
+### 3. 롤백 기준 및 명령어 문서화
+
+다음 내용을 출력한다:
+
+```markdown
+## 롤백 기준
+
+판단 기준 (하나라도 해당 시):
+- 에러율 평소 대비 2배 이상, 5분 지속
+- p95 응답시간 SLO 초과, 10분 지속
+- 핵심 기능(결제·로그인 등) 동작 불가
+
+롤백 명령:
+git revert <merge-commit-hash>
+# 또는 이전 태그 재배포: git push origin v<이전 버전>:refs/tags/v<이전 버전>
+```
+
+이후 사용자에게 머지 커밋 해시를 묻는다:
+
+```
+머지 커밋 해시를 입력해 주세요 (모르면 Enter 스킵):
+```
+
+**사용자 응답 처리:**
+- 해시가 입력되면 → 롤백 명령의 `<merge-commit-hash>` 자리에 실제 해시를 대입한다.
+- Enter(빈 입력)로 스킵하면 → `<merge-commit-hash>` 플레이스홀더를 그대로 유지한다.
+
+최종 롤백 섹션을 `$ROLLBACK_SECTION` 변수에 저장한다.
+
+---
+
+### 4. 릴리스 문서 저장
+
+`$RELEASE_DOC` 경로에 릴리스 문서를 저장한다. 문서 구조:
+
+```markdown
+# 릴리스 보고서 — <NAME> (<TODAY>)
+
+## 요약
+- 모드: <MODE>
+- 버전: <VERSION>
+- Phase 1: <PHASE1_RESULT>
+- Go/No-go: <GONOGO_RESULT>
+
+<RELEASE_NOTES>
+
+<ROLLBACK_SECTION>
+```
+
+저장 완료 후 아래 메시지를 출력하고 Phase 3를 종료한다:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Phase 3 완료
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+버전:        <VERSION>
+릴리스 문서: <RELEASE_DOC>
+다음 단계:   위 태그 명령어를 직접 실행하세요.
+```
