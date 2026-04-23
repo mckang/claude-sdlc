@@ -121,3 +121,34 @@ fi
 ```
 
 응답을 `$ACTUAL` 에 저장한다.
+
+## 4단계: 버그 문서 생성
+
+```bash
+BUG_DOC="${CLAUDE_PROJECT_DIR}/docs/bugs/bug-${SLUG}-${TODAY}.md"
+mkdir -p "${CLAUDE_PROJECT_DIR}/docs/bugs"
+```
+
+다음 내용으로 `$BUG_DOC` 를 생성한다:
+
+````markdown
+# Bug: <TITLE> — <TODAY>
+
+- 심각도: <SEVERITY>
+- 상태: Open
+
+## 재현 단계
+<REPRO_STEPS>
+
+## 기대 동작
+<EXPECTED>
+
+## 실제 동작
+<ACTUAL>
+````
+
+생성 후 확인 메시지를 출력한다:
+
+```
+✓ 버그 문서 생성: docs/bugs/bug-<SLUG>-<TODAY>.md
+```
