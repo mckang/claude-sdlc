@@ -37,19 +37,19 @@ claude --plugin-dir /path/to/sdlc-plugin
 
 ```mermaid
 flowchart TD
-    init[/sdlc:init] --> entry{시작 지점}
-    entry -->|🆕 새 기능| feature[/sdlc:feature]
-    entry -->|👋 기존 코드 합류| onboard[/sdlc:onboard]
-    entry -->|🐛 버그 수정| bug[/sdlc:bug · /sdlc:hotfix]
+    init["/sdlc:init"] --> entry{시작 지점}
+    entry -->|🆕 새 기능| feature["/sdlc:feature"]
+    entry -->|👋 기존 코드 합류| onboard["/sdlc:onboard"]
+    entry -->|🐛 버그 수정| bug["/sdlc:bug · /sdlc:hotfix"]
 
-    feature --> prd[/sdlc:prd] --> arch[/sdlc:architecture]
-    arch --> plan[/sdlc:plan]
-    arch -.설계 보강 선택.-> design[/sdlc:design] --> plan
+    feature --> prd["/sdlc:prd"] --> arch["/sdlc:architecture"]
+    arch --> plan["/sdlc:plan"]
+    arch -.설계 보강 선택.-> design["/sdlc:design"] --> plan
 
-    plan --> story[/sdlc:story<br/>start · verify · complete]
-    story --> pr[/sdlc:pr]
-    pr -.릴리스 시.-> release[/sdlc:release]
-    release -.종결.-> close[/sdlc:feature-close] -.다음.-> nxt[/sdlc:next]
+    plan --> story["/sdlc:story<br/>start · verify · complete"]
+    story --> pr["/sdlc:pr"]
+    pr -.릴리스 시.-> release["/sdlc:release"]
+    release -.종결.-> close["/sdlc:feature-close"] -.다음.-> nxt["/sdlc:next"]
 
     bug -.Plan Story 연결.-> plan
     onboard -.첫 Story 제안.-> story
