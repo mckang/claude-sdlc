@@ -158,6 +158,8 @@ mkdir -p "${CLAUDE_PROJECT_DIR}/docs/bugs"
 `scripts/resolve-plan-path.sh` 로 현재 feature 의 Plan 경로를 결정한다:
 
 ```bash
+PLAN_APPENDED=false
+
 if PLAN_OUT=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-plan-path.sh" 2>/dev/null); then
   PLAN_PATH=$(sed -n 2p <<<"$PLAN_OUT")
 else
@@ -167,21 +169,35 @@ fi
 
 ### Plan 파일이 없는 경우
 
-`PLAN_PATH` 가 비어 있거나 파일이 존재하지 않으면 상황에 따라 안내한다.
+#### current feature 미설정 (`PLAN_PATH` 가 비어 있는 경우)
 
-current feature 미설정인 경우 (스크립트가 exit 1 로 종료):
+```bash
+if [ -z "$PLAN_PATH" ]; then
+```
+
+다음을 출력하고 6단계로 진행한다 (`PLAN_APPENDED=false` 유지):
+
 ```
 ⚠️ CLAUDE.md 에 current feature 가 없습니다. 버그 문서만 생성합니다.
 ```
 
-Plan 파일이 존재하지 않는 경우 (`[ ! -f "$PLAN_PATH" ]`):
+#### Plan 파일 미존재
+
+```bash
+elif [ ! -f "$PLAN_PATH" ]; then
+```
+
+다음을 출력하고 6단계로 진행한다 (`PLAN_APPENDED=false` 유지):
+
 ```
 ⚠️ Plan 파일을 찾을 수 없습니다 (<PLAN_PATH>). 버그 문서만 생성합니다.
 ```
 
-두 경우 모두 `PLAN_APPENDED=false` 로 설정하고 6단계로 진행한다.
-
 ### Plan 파일이 있는 경우
+
+```bash
+else
+```
 
 `$PLAN_PATH` 파일 맨 끝에 다음을 append 한다:
 
@@ -196,9 +212,9 @@ Plan 파일이 존재하지 않는 경우 (`[ ! -f "$PLAN_PATH" ]`):
 - 참조: docs/bugs/bug-<SLUG>-<TODAY>.md
 ```
 
-append 후:
 ```bash
-PLAN_APPENDED=true
+  PLAN_APPENDED=true
+fi
 ```
 
 확인 메시지:
