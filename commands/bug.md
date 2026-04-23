@@ -76,6 +76,10 @@ esac
 
 SEVERITY="Critical" 이면 다음을 출력하고 **즉시 종료**한다:
 
+```bash
+if [ "$SEVERITY" = "Critical" ]; then
+```
+
 ```
 🚨 Critical 버그는 /sdlc:hotfix 로 즉각 대응하세요.
 
@@ -83,4 +87,9 @@ SEVERITY="Critical" 이면 다음을 출력하고 **즉시 종료**한다:
 → /sdlc:hotfix <title> --emergency      # 긴급 모드
 
 일반 버그 기록이 필요하면 심각도를 High 이하로 다시 실행하세요.
+```
+
+```bash
+  exit 1
+fi
 ```
