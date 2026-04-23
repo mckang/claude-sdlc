@@ -1,5 +1,7 @@
 # Local dev notes (플러그인 개발자 개인 메모)
 CLAUDE.md
+# 예제는 예외 — /sdlc:init 산출물 레퍼런스로 커밋해야 함
+!examples/*/CLAUDE.md
 
 # macOS
 .DS_Store

@@ -206,8 +206,15 @@ docs/
 | `/sdlc:pr` 이 PR 생성 안 함 | `gh` CLI 미설치 | `brew install gh && gh auth login` |
 | CLAUDE.md 충돌 | 기존 파일 존재 | `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.md` 참고해 수동 병합 |
 
+## 📚 예제
+
+이 플러그인의 전체 워크플로우(`feature → prd → architecture → plan → story × N → pr`)를 실제로 돌려 만든 레퍼런스가 있습니다. 초심자는 여기부터 보세요.
+
+- **[examples/todo-app/](examples/todo-app/)** — Next.js 14 App Router + localStorage 기반 Todo 앱. Epic 2개, Story 5개, 각 단계 산출물(feature·PRD·architecture·Plan·Story 보고서) 전부 보존.
+
 ## 버전
 
+- **v1.6.2** — 레퍼런스 예제 추가: `examples/todo-app/` — Next.js 14 App Router + TypeScript + Tailwind + localStorage 로 구성한 Todo 웹앱. 이 플러그인의 전체 SDLC 방법론(`feature → prd → architecture → plan → story × 5 → pr`)을 **실제로 따라가 만든** 완성된 산출물. `docs/features/`, `docs/prd/`, `docs/architecture/`, `docs/plans/plan-todo-app.md` + `.deps.md`, `docs/plans/todo-app/E*-S*/{kickoff,verify,complete}.md` 전부 포함. 초심자가 각 커맨드가 어떤 산출물을 남기는지 감 잡는 용도. 플러그인 코어에는 영향 없음.
 - **v1.6.1** — 초심자 진입점 개선 + 페르소나 이름 정합화: (1) README 상단에 mermaid 워크플로 다이어그램 추가 — Core/Extension 색상 구분, 3가지 시작 지점(새 기능·기존 코드 합류·버그 수정) 시각화. (2) `/sdlc:init` 완료 안내의 "다음 단계" 섹션을 Greenfield 일변 안내에서 3-choice 분기로 재구성 — 🆕 `/sdlc:feature` · 👋 `/sdlc:onboard` · 🐛 `/sdlc:bug|hotfix` 중 상황에 맞게 선택. (3) 페르소나 이름 정합성 수정 — README/roles skill/feature·meeting·scope-change 커맨드·일부 agent 설명에 남아 있던 옛 이름(Sam·Dana·Noor·Morgan·Alex·Sean·Pat·John)을 실제 `display_name`(Rhodes·Vision·Strange·Thor·Wanda·Nick·T'Challa)로 일괄 교정. 커맨드·페르소나 추가 없음 (문서·UX 만).
 - **v1.6.0** — 대규모 리팩토링 5종: (1) PreToolUse 훅 추가 — main/master 직접 커밋 차단 + `docs/standards/` 무단 수정 경고. (2) 21개 페르소나 → 13개로 통합 — analyst+ux+writer→discovery, dba+data+ml→data, security+legal→compliance, cloud+sre+finops→platform, mobile 모자를 techlead 에 흡수; 각 페르소나는 멀티-햇 구조로 도메인 전문성 보존. (3) story.md 528줄 → dispatcher(103줄) + 3개 phase 파일(start/verify/complete)로 분리. (4) resolve-plan-path.sh 공통 스크립트 추출 — 13개 커맨드 중복 로직 제거. (5) Feature Stack 지원 — `--push`/`--pop`/`--list`/`--drop` 으로 동시 멀티-feature 작업 가능 (`## Feature Stack` in CLAUDE.md).
 - **v1.5.7** — `CLAUDE.md` 의 `## Current Feature` 섹션 포맷을 YAML 스타일로 변경 (`- **이름**: X` → `- name: X`, `- **최종 갱신**: X` → `- updated: X`). 볼드/한국어 라벨 의존 제거로 사용자가 마크다운 포맷 건드려도 깨지지 않음. `scripts/resolve-current-feature.sh` 는 신·구 두 형식 모두 파싱 (backward compat). 기존 프로젝트는 그대로 동작하며, 다음 `/sdlc:feature` 호출 시 신 형식으로 자동 전환.
