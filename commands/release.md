@@ -42,6 +42,16 @@ if [[ "$FIRST_ARG" =~ ^E[0-9]+-S[0-9]+$ ]]; then
   MODE="story"
   STORY_ID="$FIRST_ARG"
 fi
+
+# --story 플래그를 명시했지만 STORY_ID가 설정되지 않은 경우 사용자에게 요청
+if [[ "$MODE" == "story" && -z "${STORY_ID:-}" ]]; then
+  echo "❓ Story ID를 입력해 주세요 (예: E1-S1):"
+  read -r STORY_ID
+  if [[ ! "$STORY_ID" =~ ^E[0-9]+-S[0-9]+$ ]]; then
+    echo "❌ 올바르지 않은 Story ID 형식입니다: $STORY_ID (예: E1-S1)"
+    exit 1
+  fi
+fi
 ```
 
 ### Plan 경로 resolve
@@ -121,7 +131,7 @@ Plan 파일을 `Read` 로 읽어 다음 정보를 수집한다:
 ```
 
 **사용자 응답 처리:**
-- "확인", "1234", "모두", "all", "ok" → 4개 항목 전부 통과, Phase 1 결과를 `[PHASE1_RESULT]` 변수에 "✅ 4/4 통과"로 기록, Phase 2 진행
+- "확인", "1234", "모두", "all", "ok" → 4개 항목 전부 통과, Phase 1 결과를 `$PHASE1_RESULT` 변수에 "✅ 4/4 통과"로 기록, Phase 2 진행
 - 특정 번호 누락 또는 "2번 아직" 등 → 해당 항목 미완료로 기록 후 중단:
 
 ```
@@ -129,4 +139,4 @@ Plan 파일을 `Read` 로 읽어 다음 정보를 수집한다:
    → 해당 항목을 완료한 후 /sdlc:release 를 다시 실행하세요.
 ```
 
-**dry-run 모드:** 사용자 응답 없이 4개 항목 모두 `[ ]` 상태로 `[PHASE1_RESULT]`에 기록 후 계속 진행.
+**dry-run 모드:** 사용자 응답 없이 4개 항목 모두 `[ ]` 상태로 `$PHASE1_RESULT`에 기록 후 계속 진행.
