@@ -7,8 +7,8 @@
     {
       "name": "sdlc",
       "source": "./",
-      "description": "SDLC support: 7 core + 11 extension commands + 13 personas",
-      "version": "1.7.0"
+      "description": "SDLC support: 7 core + 13 extension commands + 13 personas",
+      "version": "1.8.0"
     }
   ]
 }

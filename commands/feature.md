@@ -143,6 +143,12 @@ esac
 수집한 내용을 아래 **가벼운** 템플릿으로 `Write`:
 
 ```markdown
+---
+name: <name>
+status: active
+created_at: YYYY-MM-DD
+---
+
 # Feature: {한 줄 요약}
 
 - **식별자**: <name>

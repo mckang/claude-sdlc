@@ -1,6 +1,6 @@
 # sdlc — Claude Code SDLC Plugin
 
-Core 7 개 + Extension 11 개 슬래시 커맨드와 13 명의 팀 페르소나로 아이디어→릴리스→회고 전체 생명주기를 지원하는 Claude Code 플러그인.
+Core 7 개 + Extension 13 개 슬래시 커맨드와 13 명의 팀 페르소나로 아이디어→릴리스→회고→종결 전체 생명주기를 지원하는 Claude Code 플러그인.
 
 ## 설치
 
@@ -49,6 +49,7 @@ flowchart TD
     plan --> story[/sdlc:story<br/>start · verify · complete]
     story --> pr[/sdlc:pr]
     pr -.릴리스 시.-> release[/sdlc:release]
+    release -.종결.-> close[/sdlc:feature-close] -.다음.-> nxt[/sdlc:next]
 
     bug -.Plan Story 연결.-> plan
     onboard -.첫 Story 제안.-> story
@@ -56,7 +57,7 @@ flowchart TD
     classDef core fill:#e3f2fd,stroke:#1976d2,color:#000
     classDef ext fill:#fff3e0,stroke:#f57c00,color:#000
     class init,feature,prd,arch,plan,story,pr core
-    class onboard,bug,design,release ext
+    class onboard,bug,design,release,close,nxt ext
 ```
 
 파란색은 **Core(7)** — 아이디어→릴리스 최소 경로. 주황색은 **Extension** — 필요한 것만 선택.
@@ -82,7 +83,11 @@ flowchart TD
 /sdlc:story complete E1-S1
 /sdlc:pr E1-S1
 
-# 다른 feature 로 전환하려면 /sdlc:feature <다른이름> 재호출
+# 8) (선택) 릴리스·회고·종결
+/sdlc:release
+sdlc-retrospective skill
+/sdlc:feature-close           # feature 공식 종결 (status=closed)
+/sdlc:next                    # 짐 리포트 + 다음 액션 안내
 ```
 
 산출물 파일명 규약: `docs/<type>/<type>-<name>.md`
@@ -132,6 +137,12 @@ flowchart TD
 | `/sdlc:status` | Plan 진행 상황 집계 | 매일 |
 | `/sdlc:retrospective` | KPT/4L 회고 | 프로젝트당 1회 |
 | `/sdlc:onboard` | 새 팀원 온보딩 | 합류 시 |
+
+**종결·전환** (v1.8.0)
+| 커맨드 | 목적 | 빈도 |
+|---|---|---|
+| `/sdlc:feature-close` | feature 종결 선언 (soft gate 체크리스트 + frontmatter status=closed) | feature당 1회 |
+| `/sdlc:next` | 종결된 feature 의 미해결 짐 리포트 + 다음 액션 안내 | feature당 1회 |
 
 **범용·참조**
 | 커맨드 | 목적 | 빈도 |
@@ -214,6 +225,7 @@ docs/
 
 ## 버전
 
+- **v1.8.0** — Post-completion 워크플로우 도입 (feature 종결·전환): (1) `/sdlc:feature-close` 신규 — soft gate 체크리스트(Story 완료·PR·Release·Retro·Actions 파일) 로 feature 종결 선언. 미충족 항목은 경고 후 사용자 확인하면 진행 가능. feature 문서 frontmatter 에 `status: closed`, `closed_at` 주입 + `CLAUDE.md` 의 `## Current Feature` / `## Feature Stack` 에서 자동 제거. (2) `/sdlc:next` 신규 — 가장 최근 종결된 feature 의 짐(미해결 `resolved_by: open` 반대의견, 미이행 retro Try, 미완료 Story) 을 리포트하고 다음 액션(스택 대기 재개 또는 새 feature) 안내. 파일 생성·수정 없음. (3) `/sdlc:feature` 가 생성하는 feature 문서 상단에 YAML frontmatter (`name` / `status: active` / `created_at`) 자동 주입 — 이후 `feature-close` 의 상태 전환 기준.
 - **v1.7.0** — Retrospective-driven methodology 개선 4종 (todo-app 예제 회고 결과 반영):
   - **A1 (High)**: `commands/prd.md` 에 **Round 3.5 — 엣지 케이스 체크리스트** 추가. 각 FR 마다 7축(빈 상태·단일 항목·초대량·경계값·조건 결과 0건·실패 경로·권한 실패) 을 명시적 질의 → AC 소급 추가 예방. PRD 템플릿 출력에도 `## 엣지 케이스` 표 섹션 신설.
   - **A2 (Med)**: `commands/architecture.md` 에 **Round 4.5 — 구현 테크닉 · 패턴** 추가. "원칙(예: SSR 에선 `useEffect` 접근) → 구체 패턴(예: `loadedRef` 로 mount 후 첫 save 스킵)" 매핑을 강제. 아키텍처 템플릿 출력에도 `## 구현 테크닉 · 패턴` 섹션.

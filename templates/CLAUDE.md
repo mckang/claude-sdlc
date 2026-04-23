@@ -63,6 +63,8 @@ Story 완료 시 `/sdlc:pr` 로 본문 생성. 기본은 `--no-push` (사용자 
 /sdlc:status [이름|Plan] [--update]                 # 진행 상황
 /sdlc:pr <StoryID> [이름|Plan] [--draft|--no-push]  # PR
 /sdlc:scope-change [이름|Plan] [사유]               # 스코프 변경
+/sdlc:feature-close [이름]                          # feature 종결 (soft gate + status=closed)
+/sdlc:next                                         # 종결 feature 짐 리포트 + 다음 액션
 sdlc-plan-review skill                             # Plan 리뷰 (Claude 자동 제안)
 sdlc-retrospective skill [--format=kpt|4l]         # 회고 (Claude 자동 제안)
 /sdlc:onboard [--role=...] [--feature=...]          # 온보딩
