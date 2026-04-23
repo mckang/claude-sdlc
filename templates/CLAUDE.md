@@ -32,7 +32,7 @@ Task 상태는 즉시 체크박스로: `[ ]` `[~]` `[!]` `[x]`.
 
 ## 7. 스탠드업·회고
 - 매일 아침 `/sdlc:standup` 권장
-- 프로젝트 완료 시 `/sdlc:retrospective` 필수
+- 프로젝트 완료 시 `sdlc-retrospective` skill (Claude 자동 제안)
 
 ## 8. PR
 Story 완료 시 `/sdlc:pr` 로 본문 생성. 기본은 `--no-push` (사용자 검토 후 수동 푸시).
@@ -63,10 +63,10 @@ Story 완료 시 `/sdlc:pr` 로 본문 생성. 기본은 `--no-push` (사용자 
 /sdlc:status [이름|Plan] [--update]                 # 진행 상황
 /sdlc:pr <StoryID> [이름|Plan] [--draft|--no-push]  # PR
 /sdlc:scope-change [이름|Plan] [사유]               # 스코프 변경
-/sdlc:plan-review [이름|Plan] [산출물]              # Plan 리뷰
-/sdlc:retrospective [이름|Plan] [산출물] [--format=...] # 회고
+sdlc-plan-review skill                             # Plan 리뷰 (Claude 자동 제안)
+sdlc-retrospective skill [--format=kpt|4l]         # 회고 (Claude 자동 제안)
 /sdlc:onboard [--role=...] [--feature=...]          # 온보딩
-/sdlc:roles                                         # 페르소나 목록
+페르소나 목록 — sdlc-roles skill (Claude 자동 참조)
 ```
 
 산출물 파일명 규약: `docs/<type>/<type>-<name>.md`

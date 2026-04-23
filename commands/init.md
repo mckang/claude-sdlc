@@ -193,10 +193,10 @@ done
 - `/sdlc:hotfix` — 프로덕션 긴급 수정 (기본 모드 또는 --emergency 즉각 대응)
 - `/sdlc:bug` — 비긴급 버그 신고·트리아지·Plan Story 연결
 - `/sdlc:scope-change` — 스코프 변경 기록
-- `/sdlc:plan-review` — Plan 리뷰
-- `/sdlc:retrospective` — 회고
-- `/sdlc:onboard` — 새 팀원 온보딩
-- `/sdlc:roles` — 21명 페르소나 목록
+- Plan 리뷰 — `sdlc-plan-review` skill (Claude가 plan 완성 후 자동 제안)
+- 회고 — `sdlc-retrospective` skill (Claude가 feature 완료 후 자동 제안)
+- 새 팀원 온보딩 — `sdlc-onboard` skill (Claude가 신규 합류 시 자동 제안)
+- 페르소나 목록 — `sdlc-roles` skill (Claude가 미팅 계획 시 자동 참조)
 ```
 
 ## 에러 처리
