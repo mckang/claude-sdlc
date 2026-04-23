@@ -180,3 +180,85 @@ git tag v<X.Y.Z> && git push origin v<X.Y.Z>
 문서 산출물 저장과 current feature 원복은 **6단계(공통)** 에서 처리한다.
 
 **dry-run 모드:** 사용자 응답 없이 5개 항목 모두 `[ ]` 상태로 `STD_CHECKLIST_RESULT="[dry-run]"` 기록 후 계속 진행.
+
+---
+
+## 긴급 모드 (MODE=emergency)
+
+`MODE=emergency` 이면 아래 절차를 순서대로 따른다.
+
+### 2단계: Phase 1 — 문제 정의 & Thor 긴급 체크 (긴급 모드)
+
+> 목적: 롤백 준비 완료 여부를 즉시 확인한 뒤 브랜치 생성으로 넘어간다.
+
+`DRY_RUN=true` 이면 Thor GO를 자동 통과한다:
+
+```bash
+THOR_RESULT="Thor: GO — [dry-run — 실제 확인 생략]"
+```
+
+`DRY_RUN=false` 일 때, 아래를 **출력하고 사용자 응답을 기다린다**:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ Thor (Platform): 긴급 배포 전 확인
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+아래 항목을 모두 확인했으면 "확인" 또는 "12"를 입력하세요.
+미완료 항목이 있으면 해당 번호와 사유를 알려주세요.
+
+[ ] 1. 롤백 방법을 알고 있음 (이전 태그 또는 이전 이미지)
+[ ] 2. 모니터링 대시보드 확인 중
+```
+
+**사용자 응답 처리:**
+- "확인", "12", "모두", "all", "ok" → Thor GO:
+
+  ```
+  ⚡ Thor (Platform): GO ✅
+  사유: 롤백 준비됨, 모니터링 확인.
+  ```
+
+  ```bash
+  THOR_RESULT="Thor: GO — 롤백 준비됨, 모니터링 확인"
+  ```
+
+  Phase 2 진행.
+
+- 미완료 항목 있음 → Thor NO-GO, 즉시 중단:
+
+  ```bash
+  THOR_RESULT="Thor: NO-GO — 긴급 배포 전 롤백 준비 미완료"
+  ```
+
+  ```
+  🛑 Thor: NO-GO — 긴급 배포 전 롤백 준비가 필요합니다.
+  → 롤백 방법 확인 후 /sdlc:hotfix --emergency 를 다시 실행하세요.
+  → 또는 지금 바로 롤백: git revert <commit> 또는 이전 태그 재배포
+  ```
+
+### 3단계: Phase 2 — 브랜치 직접 생성 (긴급 모드)
+
+> 목적: Claude가 hotfix 브랜치를 즉시 생성한다.
+
+`DRY_RUN=false` 이면 다음 명령을 Bash로 실행한다:
+
+```bash
+git checkout main && git pull origin main
+git checkout -b hotfix/${DESCRIPTION}
+```
+
+실행 후 확인 메시지를 출력한다:
+
+```
+✅ 브랜치 생성 완료: hotfix/<DESCRIPTION>
+→ 지금 이 브랜치에서 수정을 진행하세요.
+```
+
+`DRY_RUN=true` 이면 위 명령어를 출력만 하고 실행하지 않는다:
+
+```
+🔍 [dry-run] 실행할 명령어:
+git checkout main && git pull origin main
+git checkout -b hotfix/<DESCRIPTION>
+```
