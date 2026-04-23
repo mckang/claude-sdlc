@@ -147,7 +147,7 @@ Plan 파일을 `Read` 로 읽어 다음 정보를 수집한다:
 
 ### dry-run 모드 처리
 
-`$DRY_RUN=true` 이면 두 페르소나 모두 실제 확인 없이 GO를 출력한다:
+`DRY_RUN=true` 이면 두 페르소나 모두 실제 확인 없이 GO를 출력한다:
 
 ```
 👑 T'Challa (PM): GO ✅  [dry-run — 실제 확인 생략]
