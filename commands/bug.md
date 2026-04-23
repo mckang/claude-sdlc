@@ -221,3 +221,19 @@ fi
 ```
 ✓ Plan Story 추가: <PLAN_PATH>
 ```
+
+## 6단계: 완료 요약
+
+다음 형식으로 요약을 출력한다:
+
+```
+✓ 버그 기록 완료
+
+- 문서: docs/bugs/bug-<SLUG>-<TODAY>.md
+- 심각도: <SEVERITY>
+- Plan Story 추가: <PLAN_PATH (PLAN_APPENDED=true 일 때) 또는 "없음">
+
+다음 단계:
+- /sdlc:plan 으로 Story 우선순위 조정
+- /sdlc:story start 로 수정 시작
+```
