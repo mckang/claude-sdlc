@@ -62,6 +62,10 @@ SLUG=$(echo "$TITLE" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
 응답을 `$SEVERITY_INPUT` 으로 저장한다.
 
 ```bash
+SEVERITY_INPUT="<사용자 응답>"
+```
+
+```bash
 case "$SEVERITY_INPUT" in
   1|critical|Critical) SEVERITY="Critical" ;;
   2|high|High)         SEVERITY="High" ;;
@@ -214,12 +218,12 @@ else
 
 ```bash
   PLAN_APPENDED=true
-fi
-```
 
-확인 메시지:
-```
-✓ Plan Story 추가: <PLAN_PATH>
+  확인 메시지:
+  ```
+  ✓ Plan Story 추가: <PLAN_PATH>
+  ```
+fi
 ```
 
 ## 6단계: 완료 요약
