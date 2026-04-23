@@ -186,6 +186,10 @@ Plan 파일을 `Read` 로 읽어 다음 정보를 수집한다:
 
 - 특정 번호 누락 또는 미완료 항목 응답 → T'Challa 판정: NO-GO, 즉시 중단:
 
+  ```bash
+  GONOGO_RESULT="T'Challa: NO-GO, 최종: NO-GO"
+  ```
+
   ```
   🛑 No-Go: T'Challa (PM) NO-GO — 비즈니스 준비 미완료
   → 해결 조건: (미완료 항목 번호와 사유)
@@ -223,6 +227,10 @@ T'Challa가 GO인 경우에만 진행한다.
   ```
 
 - 특정 번호 누락 또는 미완료 항목 응답 → Thor 판정: NO-GO, 즉시 중단:
+
+  ```bash
+  GONOGO_RESULT="T'Challa: GO, Thor: NO-GO, 최종: NO-GO"
+  ```
 
   ```
   🛑 No-Go: Thor (Platform) NO-GO — 인프라 준비 미완료
