@@ -154,6 +154,11 @@ Plan 파일을 `Read` 로 읽어 다음 정보를 수집한다:
 ⚡ Thor (Platform): GO ✅  [dry-run — 실제 확인 생략]
 ```
 
+```bash
+TCHALLA_RESULT="T'Challa: GO — [dry-run — 실제 확인 생략]"
+THOR_RESULT="Thor: GO — [dry-run — 실제 확인 생략]"
+```
+
 `$GONOGO_RESULT="T'Challa: GO, Thor: GO, 최종: GO"` 로 기록하고 최종 판정 출력 후 계속 진행.
 
 ---
@@ -179,6 +184,10 @@ Plan 파일을 `Read` 로 읽어 다음 정보를 수집한다:
 **사용자 응답 처리:**
 - "확인", "1234", "모두", "all", "ok" → 4개 항목 전부 통과, T'Challa 판정: GO
 
+  ```bash
+  TCHALLA_RESULT="T'Challa: GO — 이해관계자 공지 완료, KPI 대시보드 준비됨, CS 팀 사전 브리핑 완료."
+  ```
+
   ```
   👑 T'Challa (PM): GO ✅
   사유: 이해관계자 공지 완료, KPI 대시보드 준비됨, CS 팀 사전 브리핑 완료.
@@ -187,6 +196,7 @@ Plan 파일을 `Read` 로 읽어 다음 정보를 수집한다:
 - 특정 번호 누락 또는 미완료 항목 응답 → T'Challa 판정: NO-GO, 즉시 중단:
 
   ```bash
+  TCHALLA_RESULT="T'Challa: NO-GO — 비즈니스 준비 미완료"
   GONOGO_RESULT="T'Challa: NO-GO, 최종: NO-GO"
   ```
 
@@ -221,6 +231,10 @@ T'Challa가 GO인 경우에만 진행한다.
 **사용자 응답 처리:**
 - "확인", "1234", "모두", "all", "ok" → 4개 항목 전부 통과, Thor 판정: GO
 
+  ```bash
+  THOR_RESULT="Thor: GO — 알람 설정 확인, 마이그레이션 스테이징 검증 완료, runbook 업데이트됨."
+  ```
+
   ```
   ⚡ Thor (Platform): GO ✅
   사유: 알람 설정 확인, 마이그레이션 스테이징 검증 완료, runbook 업데이트됨.
@@ -229,6 +243,7 @@ T'Challa가 GO인 경우에만 진행한다.
 - 특정 번호 누락 또는 미완료 항목 응답 → Thor 판정: NO-GO, 즉시 중단:
 
   ```bash
+  THOR_RESULT="Thor: NO-GO — 인프라 준비 미완료"
   GONOGO_RESULT="T'Challa: GO, Thor: NO-GO, 최종: NO-GO"
   ```
 
@@ -448,7 +463,9 @@ Write 도구를 사용하여 `$RELEASE_DOC` 경로에 아래 구조로 파일을
 <PHASE1_RESULT>
 
 ## Phase 2: Go/No-go ✅
-<GONOGO_RESULT>
+<TCHALLA_RESULT>
+<THOR_RESULT>
+최종: GO
 
 ## Phase 3: 배포
 
