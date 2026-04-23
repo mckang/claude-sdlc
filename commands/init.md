@@ -190,6 +190,7 @@ done
 - `/sdlc:status` — 진행 상황 집계
 - `/sdlc:pr` — PR 본문 생성
 - `/sdlc:release` — Phase-Gate 릴리스 (Pre-release → Go/No-go → 배포 안내)
+- `/sdlc:hotfix` — 프로덕션 긴급 수정 (기본 모드 또는 --emergency 즉각 대응)
 - `/sdlc:scope-change` — 스코프 변경 기록
 - `/sdlc:plan-review` — Plan 리뷰
 - `/sdlc:retrospective` — 회고

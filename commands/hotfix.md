@@ -360,3 +360,123 @@ git tag v<X.Y.Z> && git push origin v<X.Y.Z>
 `DRY_RUN=true` 이면 모니터링 체크리스트를 출력만 하고 응답을 기다리지 않는다.
 
 문서 산출물 저장과 current feature 원복은 **6단계(공통)** 에서 처리한다.
+
+---
+
+## 6단계: 산출물 저장 및 완료 보고 (공통)
+
+> 기본 모드와 긴급 모드 모두 이 단계에서 합류한다.
+> 이 단계는 항상 완주한다.
+
+### 롤백 기준 수집
+
+`DRY_RUN=false` 일 때, 머지 커밋 해시를 사용자에게 요청한다:
+
+```
+머지 커밋 해시를 입력해 주세요 (모르면 Enter 스킵):
+```
+
+- 입력 시 `$MERGE_HASH` 에 저장
+- 스킵 시 `$MERGE_HASH="<merge-commit-hash>"` (플레이스홀더)
+
+`DRY_RUN=true` 이면 프롬프트 없이 `MERGE_HASH="<merge-commit-hash>"` 로 설정한다.
+
+### 릴리스 문서 작성
+
+`Write` 도구를 사용하여 `$RELEASE_DOC` 경로에 아래 문서를 생성한다.
+
+**기본 모드 (`MODE=standard`) 문서 구조:**
+
+```markdown
+# Hotfix: <DESCRIPTION> — <TODAY>
+
+- 모드: standard
+- 버전: <VERSION>
+- 영향 범위: <IMPACT>
+
+## 문제 정의
+
+<DESCRIPTION>
+
+영향 범위: <IMPACT>
+
+## 수정 내용
+
+- (수정 내용 — 필요 시 직접 보완)
+
+## 배포
+
+- 브랜치: hotfix/<DESCRIPTION>
+- PR: (PR 링크 또는 번호 — 필요 시 직접 보완)
+- 배포 시각: (배포 후 직접 기록)
+
+## 구현 체크리스트
+
+<STD_CHECKLIST_RESULT>
+
+## 롤백 기준
+
+판단 기준 (하나라도 해당 시):
+- 에러율 평소 대비 2배 이상, 5분 지속
+- p95 응답시간 SLO 초과, 10분 지속
+- 핵심 기능(결제·로그인 등) 동작 불가
+
+아래는 롤백 시 사용자가 직접 실행할 명령어이며 Claude는 실행하지 않는다:
+git revert <MERGE_HASH>
+# 또는 이전 태그 재배포
+
+## 사후 분석 (Post-mortem)
+
+### 근본 원인
+(작성 필요)
+
+### 재발 방지 조치
+(작성 필요)
+
+### 타임라인
+(작성 필요)
+```
+
+**긴급 모드 (`MODE=emergency`) 는 위 구조에 아래 섹션을 추가한다** (`## 구현 체크리스트` 앞에 삽입):
+
+```markdown
+## Go/No-go
+
+<THOR_RESULT>
+```
+
+그리고 `## 구현 체크리스트` 내용은 `<EMG_CHECKLIST_RESULT>` 를 사용한다.
+
+### Current Feature 원복
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/feature-stack.sh" pop
+```
+
+이 명령은 Feature Stack에서 이전 current feature를 꺼내 복원한다.
+
+### 최종 보고 출력
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Hotfix 완료
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+대상: hotfix/<DESCRIPTION> (<MODE>)
+버전: <VERSION>
+문서: <RELEASE_DOC>
+
+📌 다음 단계:
+1. 배포 명령 실행 (위 안내 참조)
+2. 배포 후 30분 모니터링
+3. 이상 감지 시: 롤백 기준 참조 (git revert <MERGE_HASH>)
+4. 사후 분석 (Post-mortem) 문서 보완: <RELEASE_DOC>
+```
+
+(`<DESCRIPTION>`, `<MODE>`, `<VERSION>`, `<RELEASE_DOC>`, `<MERGE_HASH>` 자리에 실제 변수 값을 출력한다.)
+
+`DRY_RUN=true 이면` 아래를 추가 출력한다:
+
+```
+🔍 dry-run 모드로 실행됨 — 실제 확인 없이 문서만 생성되었습니다.
+```
