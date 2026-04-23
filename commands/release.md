@@ -424,3 +424,70 @@ git revert <merge-commit-hash>
 릴리스 문서: <RELEASE_DOC>
 다음 단계:   위 태그 명령어를 직접 실행하세요.
 ```
+
+---
+
+## 5단계: 산출물 저장 및 최종 보고
+
+### 1. 릴리스 문서 저장
+
+Write 도구를 사용하여 `$RELEASE_DOC` 경로에 아래 구조로 파일을 저장한다.
+
+- `$MODE` 가 "story"이면 "타입" 필드에 "story", "대상" 필드에 `$STORY_ID` 를 사용한다.
+- `$MODE` 가 "feature"이면 "타입" 필드에 "feature", "대상" 필드에 `$NAME` 을 사용한다.
+- 나머지 `<...>` 자리표시자는 모두 해당 변수 값으로 치환하여 저장한다.
+
+```markdown
+# Release: <NAME> — <TODAY>
+
+- 타입: story | feature
+- 대상: <Story ID or feature name>
+- 버전: <VERSION>
+
+## Phase 1: Pre-release ✅
+<PHASE1_RESULT>
+
+## Phase 2: Go/No-go ✅
+<GONOGO_RESULT>
+
+## Phase 3: 배포
+
+### 배포 명령
+git tag <VERSION> && git push origin <VERSION>
+
+### 변경 내역
+<RELEASE_NOTES>
+
+### 롤백 기준
+<ROLLBACK_SECTION>
+```
+
+### 2. 최종 보고 출력
+
+문서 저장 완료 후 아래 형식으로 최종 보고를 출력한다. `<...>` 자리표시자는 해당 변수 값으로 채운다.
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ 릴리스 프로세스 완료
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+대상: <NAME> (<MODE>)
+버전: <VERSION>
+문서: <RELEASE_DOC>
+
+Phase 1: <PHASE1_RESULT>
+Phase 2: <GONOGO_RESULT>
+
+📌 다음 단계:
+1. 배포 명령 실행 (Phase 3 참조)
+2. 배포 후 모니터링 대시보드 확인 (30분)
+3. 이상 감지 시: $ROLLBACK_SECTION 참조
+```
+
+### 3. dry-run 모드 안내
+
+DRY_RUN=true 이면 위 최종 보고 출력 아래에 다음 메시지를 추가로 출력한다:
+
+```
+🔍 dry-run 모드로 실행됨 — 실제 확인 없이 문서만 생성되었습니다.
+```
