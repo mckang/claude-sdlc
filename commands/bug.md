@@ -30,13 +30,15 @@ TITLE="${POS_ARGS[*]:-}"
 TODAY=$(date +%Y-%m-%d)
 ```
 
+### title 수집
+
 `TITLE` 이 비어 있으면 사용자에게 묻는다:
 
 ```
 버그 제목을 한 줄로 입력해 주세요 (예: login-button-not-responding):
 ```
 
-응답을 받아 `$TITLE` 에 저장하고 slug 를 생성한다:
+응답을 받아 `$TITLE` 에 저장한다. title 에 공백이 있으면 하이픈으로 변환해 `$SLUG` 를 생성한다 (인자로 제공한 경우도 동일하게 적용):
 
 ```bash
 SLUG=$(echo "$TITLE" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
