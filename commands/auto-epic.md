@@ -198,6 +198,7 @@ Agent({
 - Feature 이름: <NAME>
 - 관련 문서 (필요 시 Read): PRD (`docs/prd/prd-<NAME>.md`), architecture (`docs/architecture/architecture-<NAME>.md`), 해당 스택의 표준 (`docs/standards/...`)
 - 참고 인스트럭션: `commands/story.md` 의 3-A·3-B·3-C 절과 `commands/auto-story.md` 의 2~3 단계. 이 내용을 이 worktree 안에서 **동일하게** 수행하세요. 단 아래 "금지 사항" 은 절대 위반하지 마세요.
+- 기준 SHA: `<EXPECTED_BASE_SHA>` — Story 브랜치의 base 로 사용. wrapper 가 dispatch 직전 `git rev-parse main` 으로 캡처한 main HEAD. worktree 의 현재 HEAD 가 stale 일 수 있으므로 이 값을 직접 사용하세요.
 
 ## 필수 산출물
 1. `story/<STORY_ID>-<kebab-slug>` 브랜치를 main 기반으로 생성하고 이 브랜치에서 작업 (worktree 루트에서 `git checkout -b ...`).
