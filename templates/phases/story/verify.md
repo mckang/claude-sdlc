@@ -66,6 +66,22 @@ Story의 DoD 체크리스트를 순회:
 - [ ] 성능 기준 충족 — 측정 안 함 (NFR 인증 p95 500ms)
 ```
 
+## 4.5. 환경 제약으로 skip 된 검증 (해당 시)
+
+verify 도구가 코드 결함이 아닌 **환경/설정 충돌** (예: 부모 디렉토리 설정 walk-up, 중첩 config 충돌) 로 실패한 경우 자체 우회 시도 X. 아래 표에 기록 후 STATUS 를 `completed-degraded` 로 반환한다.
+
+```markdown
+| 도구 | 환경 충돌 reason | 사후 책임 |
+|---|---|---|
+| <tool 식별자> | <한 줄 요약 — 출력의 "duplicate"/"loaded twice"/"conflict with parent" 등 환경 패턴> | release-gate / retro 재검증 |
+```
+
+본 표가 비어 있으면 STATUS 는 일반 (`completed` / `completed-forced` / `failed`) 중 하나. 비어 있지 않으면 반드시 `completed-degraded`.
+
+판정 기준 (subagent 가 환경 충돌인지 코드 결함인지 구분):
+- **환경 충돌 후보**: 도구 출력에 "duplicate", "loaded twice", "conflict with parent", "ambiguous" 등 명시적 환경 패턴 + 동일 명령이 main worktree (parent) 에서 정상 동작.
+- **코드 결함**: 위 외 (테스트 실패 메시지, lint 규칙 위반 등) — `STATUS: failed | reason: verify-fail:<tool>`.
+
 ## 5. 표준 체크리스트 (자동)
 
 관련 표준의 "금지 사항" 섹션을 기준으로 코드 점검:
