@@ -226,6 +226,35 @@ Agent({
 4. `${CLAUDE_PROJECT_DIR}/docs/plans/<NAME>/<STORY_ID>/verify.md` 작성 (commands/story.md 3-B-6 형식).
 5. `${CLAUDE_PROJECT_DIR}/docs/plans/<NAME>/<STORY_ID>/complete.md` 작성 (commands/story.md 3-C-5 형식).
 
+## 작업 컨텍스트 가드 (필수)
+
+산출물 1번 (Story 브랜치 생성) 이후의 모든 **git / 빌드 / 테스트 / lint** 명령은 다음 가드를 첫 줄로 prepend 한 뒤 실행하세요. Bash tool 호출 사이에 cwd 가 main worktree 로 라우팅되는 환경 동작이 관측되었으므로, 매 호출에서 **stateless 로 worktree 를 재유도** 합니다.
+
+```bash
+STORY_BRANCH="<STORY_BRANCH>"   # 위 컨텍스트의 자리표시 값을 literal 로 — 예: "story/E1-S3-design-tokens"
+WT="$(git worktree list --porcelain | awk '
+  /^worktree /{wt=$2}
+  /^branch refs\/heads\/'"$STORY_BRANCH"'$/{print wt}
+')"
+[ -n "$WT" ] && cd "$WT" || {
+  echo "STATUS: failed | reason: cwd-guard-violated"
+  exit 1
+}
+```
+
+**적용 대상**:
+- 모든 `git ...` 명령 (단 산출물 1번의 `git checkout -b` 자체는 *예외* — branch 가 아직 없으므로 가드 매칭 실패).
+- 빌드/테스트/lint 도구 호출 (예: `pnpm test`, `pytest`, `cargo build`, `go test`, `./gradlew check`).
+- 파일 수정으로 이어지는 명령 (예: scaffolding tool, codegen).
+
+**적용 면제**:
+- Read-only 명령 (`ls`, `cat`, `grep`, Read tool) — main 오염으로 이어지지 않음.
+- 산출물 1번의 첫 `git checkout -b ...` 명령 — branch 가 아직 worktree-list 에 없음.
+
+**가드 실패 (worktree-list 에 매칭 branch 없음) 시**:
+- 자체 회복 시도 X (cherry-pick / reflog 탐색 등 금지).
+- `STATUS: failed | reason: cwd-guard-violated` 로 즉시 반환.
+
 ## 금지 사항 (엄수)
 - main/master 브랜치에 체크아웃하거나 머지하지 마세요.
 - `<PLAN_ABSOLUTE_PATH>` (Plan 파일 본체) 를 수정하지 마세요. 상태 마크·체크박스·스냅샷 갱신은 wrapper 가 fan-in 에서 수행합니다.
