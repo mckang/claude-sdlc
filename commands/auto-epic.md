@@ -371,7 +371,7 @@ git merge --no-ff story/<STORY_ID>-<slug> \
 - Plan 에 Epic 섹션 없음 → Plan 내 Epic ID 목록 제시 후 중단
 - deps.md 없음/비어 있음 → `--sequential` 자동 폴백 + 경고 출력
 - deps.md 순환 의존 → 사이클 출력 후 중단
-- subagent 가 `STATUS:` 라인 없이 반환 → `failed` 로 취급, reason 에 "프로토콜 위반" 기록
+- subagent 가 `STATUS:` 라인 없이 반환 또는 형식 오류 → `STATUS: failed | reason: protocol-violation` 으로 취급 (판정 정책 표 참조)
 - Fan-in 머지 충돌 → 즉시 중단, state 보존
 - 워킹 트리 dirty / main 외 브랜치 → `/sdlc:story` 의 3-A-0 분기 그대로 적용
 
