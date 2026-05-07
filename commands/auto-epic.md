@@ -298,10 +298,23 @@ WT="$(git worktree list --porcelain | awk '
         새로 생긴 commit: <git log MAIN_BEFORE..MAIN_AFTER --oneline>
 
      다음 옵션 중 선택:
-     - (a) main 을 BEFORE 로 자동 reset (story 브랜치는 보존) [본 PR 미구현 — 사용자 수동]
+     - (a) main 을 BEFORE 로 자동 reset (story 브랜치는 보존) — 사용자 (y/N) 명시 동의 필수
      - (b) 수동 검토 (이 Epic 중단)
      ```
-     본 PR 시점에서는 자동 reset 미구현 — 사용자 수동 처리. 자동 reset 은 후속 PR (destructive 동작 검토 후).
+     **옵션 (a) 자동 reset 절차** (사용자가 (a) 를 명시 선택한 경우에만 실행 — destructive, 묵시 진행 금지):
+
+     ```bash
+     git checkout main
+     git reset --hard <MAIN_BEFORE>
+     git worktree list   # story/* 브랜치는 별도 ref 라 그대로 보존됨 — 출력에서 확인
+     ```
+
+     reset 후 다음 1줄 출력:
+     ```
+     ✅ main 을 <MAIN_BEFORE> 로 reset 완료. 보존된 story/* 브랜치: <개수> 개 (worktree 정상).
+     ```
+
+     reset 명령이 실패하면 (drift / 충돌) 즉시 중단하고 사용자에게 수동 처리 안내. 자동 retry X.
 
 ### Step 4. 결과 수집 + 사용자 개입
 
