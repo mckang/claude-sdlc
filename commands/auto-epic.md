@@ -201,7 +201,11 @@ Agent({
 - 기준 SHA: `<EXPECTED_BASE_SHA>` — Story 브랜치의 base 로 사용. wrapper 가 dispatch 직전 `git rev-parse main` 으로 캡처한 main HEAD. worktree 의 현재 HEAD 가 stale 일 수 있으므로 이 값을 직접 사용하세요.
 
 ## 필수 산출물
-1. `story/<STORY_ID>-<kebab-slug>` 브랜치를 main 기반으로 생성하고 이 브랜치에서 작업 (worktree 루트에서 `git checkout -b ...`).
+1. `story/<STORY_ID>-<kebab-slug>` 브랜치를 위 컨텍스트의 `<EXPECTED_BASE_SHA>` 를 base 로 **명시 생성**:
+   ```bash
+   git checkout -b story/<STORY_ID>-<slug> <EXPECTED_BASE_SHA>
+   ```
+   `Agent isolation: "worktree"` 가 만들어주는 worktree 의 현재 HEAD 가 wrapper 의 main HEAD 와 다를 수 있으므로 (stale base 가능성), `main` 이 아닌 SHA 를 직접 인자로 사용. 이 단계가 실패하면 (예: `<EXPECTED_BASE_SHA>` 가 worktree 에서 보이지 않음) `STATUS: failed | reason: base-stale | expected: <EXPECTED_BASE_SHA> | actual: $(git rev-parse HEAD)` 로 즉시 반환.
 2. `${CLAUDE_PROJECT_DIR}/docs/plans/<NAME>/<STORY_ID>/kickoff.md` 작성 (commands/story.md 3-A-5 의 프런트매터 + 본문).
 3. AC·DoD 에 부합하는 코드 + 테스트 작성 → 단위 테스트 실행 → 린트 → 커밋 (논리 단위별 분리 커밋).
 4. `${CLAUDE_PROJECT_DIR}/docs/plans/<NAME>/<STORY_ID>/verify.md` 작성 (commands/story.md 3-B-6 형식).
