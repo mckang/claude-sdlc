@@ -212,18 +212,26 @@ Agent({
 - Story 브랜치를 삭제하지 마세요. worktree 를 직접 제거하지 마세요.
 - `git push` 를 하지 마세요.
 
-## 판정 정책
-- Kickoff 보고서에 "⚠️ 확인 필요 사항" 이 1 건 이상이면 **코드 작성 전 즉시 반환**:
-    STATUS: needs_user | questions: <한 줄 요약>
-- verify 최종 판정 ✅ PASS → complete 진행 → 커밋 → 반환:
-    STATUS: completed | branch: story/<STORY_ID>-<slug> | commits: <N>
-- verify 🟡 CONDITIONAL PASS 또는 미해결 DoD → 알려진 미완을 complete.md 에 기록 후 강제 complete → 커밋 → 반환:
-    STATUS: completed-forced | branch: story/<STORY_ID>-<slug> | commits: <N> | unresolved: <요약>
-- verify ❌ FAIL → 커밋하지 말고 반환:
-    STATUS: failed | reason: <한 줄 요약>
+## 판정 정책 — STATUS 라인 표준
+
+각 subagent 는 **마지막 줄을 반드시 단일 `STATUS: ...` 라인으로 종료**해야 한다. 표의 reason 코드 외 자유 서술 reason 도 backward compat 으로 허용 — wrapper 는 사용자 개입 정책으로 처리.
+
+| STATUS | 추가 필드 / reason | 발생 조건 | wrapper 정책 |
+|---|---|---|---|
+| `needs_user` | `questions: <요약>` | Kickoff `## ⚠️ 확인 필요 사항` 1 건 이상 (코드 작성 전 즉시 반환) | 사용자 (a)/(b)/(c) 옵션 제시 |
+| `completed` | `branch: story/<ID>-<slug> \| commits: <N>` | verify ✅ PASS + complete 정상 | 정상 fan-in |
+| `completed-forced` | `... \| unresolved: <요약>` | verify 🟡 CONDITIONAL PASS 또는 미해결 DoD (알려진 미완 complete.md 기록 후 강제 complete) | 사용자 알림 후 fan-in |
+| `completed-degraded` | `... \| degraded: verify-env-skip:<tool>` | verify 도구가 환경 충돌 (중첩 설정 walk-up 등) 로 skip — 코드 결함 아님 | fan-in + release-gate / retro 에서 재검증 |
+| `failed` | `reason: base-stale \| expected: <SHA> \| actual: <SHA>` | (안전망) base anchor 불일치 — 후속 PR 의 가드가 트리거 | wrapper 가 fresh dispatch 1회 자동 재시도 |
+| `failed` | `reason: cwd-guard-violated` | (자리표시) 후속 PR 의 cwd 가드 위반 | wrapper 가 retry 1회 후 사용자 |
+| `failed` | `reason: verify-fail:<tool>` | verify ❌ FAIL — 코드 결함 | 사용자 개입 (커밋 금지, 강제 complete 금지) |
+| `failed` | `reason: protocol-violation` | STATUS 라인 누락/형식 오류 | 사용자 개입 |
+| `failed` | `reason: <자유 서술>` | 그 외 (backward compat) | 사용자 개입 |
+
+> 본 표의 `cwd-guard-violated` 는 후속 PR (A1 cwd 가드) 가 채울 자리표시. 본 PR 시점에서는 코드로 발생하지 않는다.
 
 ## 반환 형식
-마지막 줄을 반드시 위 형식 중 하나의 단일 `STATUS: ...` 라인으로 끝내세요. 그 앞쪽은 요약 자유 서술 (변경 파일, 커밋 해시, 테스트 수 등).
+마지막 줄을 위 표 중 하나의 단일 `STATUS: ...` 라인으로 끝내세요. 그 앞쪽은 요약 자유 서술 (변경 파일, 커밋 해시, 테스트 수 등).
 ```
 
 3. **결과 수집**: 모든 `Agent` 결과 수신 후 각 결과의 마지막 `STATUS:` 라인을 파싱.
