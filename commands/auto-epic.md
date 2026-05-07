@@ -184,12 +184,14 @@ advisory 라인 규칙:
      ```
    - **Story 별** (각 prompt 치환 시):
      ```bash
-     STORY_BRANCH="story/${STORY_ID}-${SLUG}"   # 예: story/E1-S3-design-tokens
+     STORY_BRANCH="story/${STORY_ID}-${SLUG}"        # 예: story/E1-S3-design-tokens
+     SOFT_PREDECESSORS="$(soft_predecessors[STORY_ID])"   # 예: "E2-S1, E4-S1" 또는 빈 문자열
      ```
 
    치환 흐름:
    - `EXPECTED_BASE_SHA` → 각 subagent prompt 의 `<EXPECTED_BASE_SHA>` 자리.
    - `STORY_BRANCH` → 각 subagent prompt 의 `<STORY_BRANCH>` 자리. 가드와 worktree 재유도의 식별자로 쓰이며 plugin 의 branch naming 컨벤션이 안정적 식별자 역할을 한다.
+   - `SOFT_PREDECESSORS` → consumer Story prompt 의 advisory bullet 자리. **빈 문자열이면 advisory bullet 자체를 prompt 에 넣지 않는다** (조건부 치환 — 불필요 noise 제거).
 2. 레벨 안의 Story 수 > `--max-parallel` 이면: 앞에서부터 N 개씩 **슬라이스 배치** (배치 완료 후 다음 배치).
 3. 한 배치의 모든 Story 를 **단일 메시지 안에서** `Agent` 복수 호출 (진짜 병렬):
 
