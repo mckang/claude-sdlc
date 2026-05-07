@@ -226,6 +226,7 @@ Agent({
 - 참고 인스트럭션: `commands/story.md` 의 3-A·3-B·3-C 절과 `commands/auto-story.md` 의 2~3 단계. 이 내용을 이 worktree 안에서 **동일하게** 수행하세요. 단 아래 "금지 사항" 은 절대 위반하지 마세요.
 - 기준 SHA: `<EXPECTED_BASE_SHA>` — Story 브랜치의 base 로 사용. wrapper 가 dispatch 직전 `git rev-parse main` 으로 캡처한 main HEAD. worktree 의 현재 HEAD 가 stale 일 수 있으므로 이 값을 직접 사용하세요.
 - Story 브랜치 이름: `<STORY_BRANCH>` — 가드와 worktree 재유도의 식별자. wrapper 가 dispatch 시점에 `story/<STORY_ID>-<slug>` 로 계산해 주입한다. 본 prompt 안에서 literal 로 사용 (예: `STORY_BRANCH="story/E1-S3-design-tokens"`).
+- (**조건부 — `SOFT_PREDECESSORS` 가 non-empty 일 때만 wrapper 가 본 bullet 을 prompt 에 삽입**) Soft 의존 advisory: 선행 Story `<SOFT_PREDECESSORS>` 의 합의 (props/API/스키마 또는 Mock 인터페이스) 가 `docs/architecture/architecture-<NAME>.md` 에 명시되어 있는지 *코드 작성 전* 먼저 확인. 합의 미명시 시 즉시 `STATUS: needs_user | questions: Soft 선행 Story 합의 미명시 (<선행 Story 목록>)` 으로 반환. 합의가 확인되면 정상 진행 — soft 는 위상정렬 블로킹이 아니라 advisory.
 
 ## 필수 산출물
 1. `story/<STORY_ID>-<kebab-slug>` 브랜치를 위 컨텍스트의 `<EXPECTED_BASE_SHA>` 를 base 로 **명시 생성**:
