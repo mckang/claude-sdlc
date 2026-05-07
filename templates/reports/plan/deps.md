@@ -21,7 +21,7 @@ graph LR
 ### 범례
 - 🔴 빨간 테두리: 크리티컬 패스 (지연 허용 없음)
 - 실선 화살표: 하드 블로킹 (A 없이 B 불가)
-- 점선 화살표: 소프트 의존 (Mock 등으로 우회 가능)
+- 점선 화살표: 소프트 의존 — 선행 Story 의 *합의/계약* (props/API/스키마 또는 Mock 인터페이스) 만 필요. `/sdlc:auto-epic` v1.11.0+ 위상정렬에서 **블로킹 X**, consumer Story 의 advisory 로만 처리. 합의는 architecture 단계에서 결정해 두어야 함.
 
 ## 병렬화 트랙
 
