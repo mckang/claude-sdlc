@@ -260,6 +260,7 @@ WT="$(git worktree list --porcelain | awk '
 - `<PLAN_ABSOLUTE_PATH>` (Plan 파일 본체) 를 수정하지 마세요. 상태 마크·체크박스·스냅샷 갱신은 wrapper 가 fan-in 에서 수행합니다.
 - Story 브랜치를 삭제하지 마세요. worktree 를 직접 제거하지 마세요.
 - `git push` 를 하지 마세요.
+- 작업 컨텍스트 가드를 우회하지 마세요. `cd <main repo path>`, `git -C <main repo path>`, 환경변수 우회 (`$STORY_BRANCH` 재정의 등) 모두 금지. 가드 실패 시 자체 회복 시도 X — `STATUS: failed | reason: cwd-guard-violated` 반환만.
 
 ## 판정 정책 — STATUS 라인 표준
 
